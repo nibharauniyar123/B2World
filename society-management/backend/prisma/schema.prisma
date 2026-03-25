@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "windows"]
 }
 
@@ -8,22 +8,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String
+
+  societyId Int?
+  society   Society? @relation(fields: [societyId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
 model Society {
   id        Int      @id @default(autoincrement())
   name      String
+  user      User[]
   createdAt DateTime @default(now())
-
-  users     User[]
 }
 
-model User {
-  id         Int      @id @default(autoincrement())
-  name       String
-  email      String   @unique
-  password   String
-  role       String
-  societyId  Int
-  createdAt  DateTime @default(now())
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  RESIDENT
+  TENANT
+  GUARD
+  ACCOUNTANT
+}
 
-  society    Society  @relation(fields: [societyId], references: [id])
+model Complaint {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  status      String   @default("OPEN")
+  userId      String
+  societyId   Int?
+  createdAt   DateTime @default(now())
 }
