@@ -1,22 +1,26 @@
-const express = require("express")
+import express from "express";
+import {
+  createSociety,
+  getSocieties,
+  updateSociety,
+  deleteSociety,
+  getSocietyUsers,
+  joinSociety,
+} from "../controllers/societyController.js";
 
-const router = express.Router()
+import { protect } from "../middleware/authMiddleware.js";
+import { authorizeRoles } from "../middleware/roleMiddleware.js";
 
-const societyController = require("../controllers/societyController")
-const authMiddleware = require("../middleware/authMiddleware")
-const roleMiddleware = require("../middleware/roleMiddleware")
-const { joinSociety } = require("../controllers/societyController")
+const router = express.Router();
 
-router.post("/", authMiddleware, roleMiddleware(["admin"]), societyController.createSociety)
+// ONLY SUPER ADMIN
+router.post("/", protect, authorizeRoles("SUPER_ADMIN"), createSociety);
+router.put("/:id", protect, authorizeRoles("SUPER_ADMIN"), updateSociety);
+router.delete("/:id", protect, authorizeRoles("SUPER_ADMIN"), deleteSociety);
 
-router.get("/", authMiddleware, roleMiddleware(["admin"]), societyController.getSocieties)
+// ALL USERS
+router.get("/", protect, getSocieties);
+router.get("/:id/users", protect, getSocietyUsers);
+router.post("/:id/join", protect, joinSociety);
 
-router.put("/:id", authMiddleware, roleMiddleware(["admin"]), societyController.updateSociety)
-
-router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), societyController.deleteSociety)
-
-router.get("/:id/users", authMiddleware, roleMiddleware(["admin"]), societyController.getSocietyUsers)
-
-router.post("/join/:id", authMiddleware, joinSociety)
-
-module.exports = router
+export default router;

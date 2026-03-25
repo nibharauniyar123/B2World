@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard"
 import Users from "./pages/Users"
 import Societies from "./pages/Societies"
 import UserDashboard from "./pages/UserDashboard";
+import Complaints from "./pages/Complaints";
 
 import ProtectedRoute from "./components/ProtectedRoute"
 
@@ -50,6 +51,7 @@ function App(){
      </ProtectedRoute>
     }
    />
+   <Route path="/complaints" element={<Complaints />} />
 
   </Routes>
 
