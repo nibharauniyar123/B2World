@@ -1,70 +1,80 @@
-import { useEffect,useState } from "react"
-import API from "../api/axios"
-import Sidebar from "../components/Sidebar"
-import Navbar from "../components/Navbar"
 
-function Societies(){
 
- const [societies,setSocieties] = useState([])
- const [name,setName] = useState("")
+import { useEffect, useState } from "react";
+import { getSocieties, createSociety, deleteSociety } from "../api/societyService";
 
- const fetchSocieties = async()=>{
+export default function Societies() {
 
-  const res = await API.get("/society")
+  const [societies, setSocieties] = useState([]);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
 
-  setSocieties(res.data)
+  useEffect(() => {
+    loadSocieties();
+  }, []);
 
- }
+  const loadSocieties = async () => {
+    const data = await getSocieties();
+    setSocieties(data);
+  };
 
- useEffect(()=>{
-  fetchSocieties()
- },[])
+  const handleCreate = async () => {
+    await createSociety({ name, address });
+    loadSocieties();
+  };
 
- const createSociety = async()=>{
+  const handleDelete = async (id) => {
+    await deleteSociety(id);
+    loadSocieties();
+  };
 
-  await API.post("/society",{name})
+  return (
+    <div>
 
-  fetchSocieties()
+      <h2>Societies</h2>
 
- }
+      <input
+        placeholder="Society Name"
+        onChange={(e) => setName(e.target.value)}
+      />
 
- return(
+      <input
+        placeholder="Address"
+        onChange={(e) => setAddress(e.target.value)}
+      />
 
-  <div style={{display:"flex"}}>
+      <button onClick={handleCreate}>
+        Create
+      </button>
 
-   <Sidebar/>
+      <table border="1">
 
-   <div style={{flex:1}}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-    <Navbar/>
+        <tbody>
+          {societies.map((s) => (
+            <tr key={s.id}>
+              <td>{s.name}</td>
+              <td>{s.address}</td>
 
-    <h2>Societies</h2>
+              <td>
+                <button onClick={() => handleDelete(s.id)}>
+                  Delete
+                </button>
+              </td>
 
-    <input
-     placeholder="Society name"
-     onChange={(e)=>setName(e.target.value)}
-    />
+            </tr>
+          ))}
+        </tbody>
 
-    <button onClick={createSociety}>
-     Create
-    </button>
+      </table>
 
-    <ul>
-
-     {societies.map((society)=>(
-      <li key={society.id}>
-       {society.name}
-      </li>
-     ))}
-
-    </ul>
-
-   </div>
-
-  </div>
-
- )
-
+    </div>
+  );
 }
-
-export default Societies

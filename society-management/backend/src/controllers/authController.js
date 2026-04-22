@@ -56,7 +56,7 @@ export const loginUser = async (req, res) => {
       {
         id: user.id,
         role: user.role,
-        societyId: user.societyId,
+        //societyId: user.societyId,
       },
       process.env.JWT_SECRET
     );

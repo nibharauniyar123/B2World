@@ -1,56 +1,71 @@
-import { useEffect,useState } from "react"
-import API from "../api/axios"
-import Sidebar from "../components/Sidebar"
-import Navbar from "../components/Navbar"
 
-function Dashboard(){
 
- const [stats,setStats] = useState(null)
+import { useEffect, useState } from "react";
+import API from "../api/axios";
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+import Card from "../components/Card";
 
- useEffect(()=>{
 
-  const fetchStats = async()=>{
+function Dashboard() {
 
-   const res = await API.get("/dashboard")
+  const [stats, setStats] = useState(null);
 
-   setStats(res.data)
+  useEffect(() => {
 
-  }
+    const fetchStats = async () => {
+      try {
+        const res = await API.get("/dashboard");
+        setStats(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  fetchStats()
+    fetchStats();
 
- },[])
+  }, []);
 
- return(
+  return (
 
-  <div style={{display:"flex"}}>
+    <div className="flex">
 
-   <Sidebar/>
+      <Sidebar />
 
-   <div style={{flex:1}}>
+      <div className="flex-1">
 
-    <Navbar/>
+        <Navbar />
 
-    <h2>Dashboard</h2>
+        <div className="p-6">
 
-    {stats && (
+          <h1 className="text-2xl font-bold mb-6">
+            Dashboard
+          </h1>
 
-     <div>
+          {stats && (
 
-      <p>Total Users: {stats.totalUsers}</p>
 
-      <p>Total Societies: {stats.totalSocieties}</p>
+              <div className="grid grid-cols-4 gap-6">
 
-     </div>
+ <Card title="Total Users" value="10"/>
+ <Card title="Total Societies" value="3"/>
+ <Card title="Complaints" value="5"/>
+ <Card title="Notices" value="2"/>
 
-    )}
+ </div>
 
-   </div>
+            // </div>
 
-  </div>
+          )}
 
- )
+        </div>
+
+      </div>
+
+    </div>
+
+  );
 
 }
 
-export default Dashboard
+export default Dashboard;

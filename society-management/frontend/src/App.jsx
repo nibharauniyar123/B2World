@@ -1,13 +1,22 @@
 import { Routes,Route } from "react-router-dom"
-
+import Layout from "./components/Layout"
+import "./index.css"
+import Navbar from "./components/Navbar"
 import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
 import Users from "./pages/Users"
 import Societies from "./pages/Societies"
 import UserDashboard from "./pages/UserDashboard";
 import Complaints from "./pages/Complaints";
+import AdminComplaints from "./pages/AdminComplaints";
+import ProtectedRoute from "./components/ProtectedRoute";
+// import MyComplaints from "./pages/MyComplaints";
+import Bookings from "./pages/Bookings";
+import Flats from "./pages/Flats";
+import Notices from "./pages/Notices";
+import Visitors from "./pages/Visitors";
+import Maintenance from "./pages/Maintenance";
 
-import ProtectedRoute from "./components/ProtectedRoute"
 
 function App(){
 
@@ -52,11 +61,24 @@ function App(){
     }
    />
    <Route path="/complaints" element={<Complaints />} />
+   <Route path="/admin/complaints" element={<AdminComplaints />} />
+   {/* <Route path="/my-complaints" element={<MyComplaints />} /> */}
+   <Route path="/bookings" element={<Bookings />} />
+   <Route path="/flats" element={<Flats />} />
+   <Route path="/notices" element={<Notices />} />
+   <Route path="/visitors" element={<Visitors />} />
+   <Route path="/maintenance" element={<Maintenance />} />
+
+   {/* <Route path="*" element={<h1>404 Not Found</h1>} /> */}  
+   <Route path="/navbar" element={<Navbar />} />
+   <Route path="/layout" element={<Layout />} />
+
 
   </Routes>
 
  )
 
 }
+
 
 export default App

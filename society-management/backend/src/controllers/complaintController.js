@@ -1,59 +1,54 @@
-import prisma from "../prisma/prismaClient.js";
+import prisma from "../config/prisma.js"
 
 // CREATE COMPLAINT
-export const createComplaint = async (req, res) => {
-  try {
-    const { title, description } = req.body;
+export const createComplaint = async (req,res)=>{
+ try{
 
-    const complaint = await prisma.complaint.create({
-      data: {
-        title,
-        description,
-        userId: req.user.id,
-        societyId: req.user.societyId,
-      },
-    });
+  const { title, description, societyId } = req.body
 
-    res.json({
-      message: "Complaint created",
-      complaint,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const complaint = await prisma.complaint.create({
+   data:{
+    title,
+    description,
+    status:"PENDING",
+
+    user:{
+     connect:{
+      id:req.user.id
+     }
+    },
+
+    society:{
+     connect:{
+      id:Number(societyId)
+     }
+    }
+
+   }
+  })
+
+  res.json(complaint)
+
+ }catch(error){
+  res.status(500).json({error:error.message})
+ }
+}
+
 
 // GET ALL COMPLAINTS
-export const getComplaints = async (req, res) => {
-  try {
-    const complaints = await prisma.complaint.findMany({
-      where: {
-        societyId: req.user.societyId,
-      },
-    });
+export const getComplaints = async (req,res)=>{
+ try{
 
-    res.json(complaints);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  const complaints = await prisma.complaint.findMany({
+   include:{
+    user:true,
+    society:true
+   }
+  })
 
-// UPDATE STATUS
-export const updateComplaintStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-    const id = req.params.id;
+  res.json(complaints)
 
-    const complaint = await prisma.complaint.update({
-      where: { id },
-      data: { status },
-    });
-
-    res.json({
-      message: "Status updated",
-      complaint,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+ }catch(error){
+  res.status(500).json({error:error.message})
+ }
+}

@@ -1,29 +1,41 @@
-function Navbar(){
 
- const logout = ()=>{
-  localStorage.removeItem("token")
-  window.location.href="/"
- }
+import { useNavigate } from "react-router-dom";
 
- return(
+export default function Navbar() {
 
-  <div style={{
-   background:"#eee",
-   padding:"15px",
-   display:"flex",
-   justifyContent:"space-between"
-  }}>
+  const navigate = useNavigate();
 
-   <h3>Society Admin Dashboard</h3>
+  const handleLogout = () => {
 
-   <button onClick={logout}>
-    Logout
-   </button>
+    // remove token
+    localStorage.removeItem("token");
 
-  </div>
+    // redirect to login
+    navigate("/");
 
- )
+  };
+
+  return (
+
+    <div className="flex justify-between items-center bg-white shadow p-4">
+
+      {/* Title */}
+
+      <h1 className="text-xl font-bold text-gray-700">
+        Society Admin Dashboard
+      </h1>
+
+      {/* Logout Button */}
+
+      <button
+        onClick={handleLogout}
+        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  );
 
 }
-
-export default Navbar

@@ -21,13 +21,32 @@ function Sidebar(){
     <li>
       <Link to="/societies">Societies</Link>
     </li>
+    <li>
+      <Link to="/visitors">Visitors</Link>  
+    </li>
+    <li>
+      <Link to="/complaints">Complaints</Link>
+    </li>
+    <li>
+      <Link to="/flats">Flats</Link>  
+    </li>
+    <li>
+      <Link to="/notices">Notices</Link>
+    </li>
+    <li>
+      <Link to="/bookings">Bookings</Link>
+    </li>
+    <li>
+      <Link to="/maintenance">Maintenance</Link>
+    </li>
+   
+    
 
    </ul>
 
   </div>
 
  )
-
 }
 
-export default Sidebar
+  export default Sidebar

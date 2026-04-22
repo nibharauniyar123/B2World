@@ -41,7 +41,8 @@ import {
   getMe,
 } from "../controllers/userController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { protect} from "../middleware/authMiddleware.js";
+
 
 const router = express.Router();
 
@@ -49,6 +50,6 @@ router.post("/", protect, createUser);
 router.get("/", protect, getUsers);
 router.delete("/:id", protect, deleteUser);
 router.put("/:id/role", protect, changeUserRole);
-router.get("/me", protect, getMe);
+router.get("/me", protect , getMe);
 
 export default router;

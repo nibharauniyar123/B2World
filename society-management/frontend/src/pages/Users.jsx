@@ -1,82 +1,105 @@
-// import { useEffect,useState } from "react"
+
+
+// import { useEffect, useState } from "react"
 // import API from "../api/axios"
-// import Sidebar from "../components/Sidebar"
-// import Navbar from "../components/Navbar"
 
 // function Users(){
 
 //  const [users,setUsers] = useState([])
-//  const [page,setPage] = useState(1)
-//  const [search,setSearch] = useState("")
+//  const [name,setName] = useState("")
+//  const [email,setEmail] = useState("")
 
 //  const fetchUsers = async()=>{
-
-//   const res = await API.get(`/users?page=${page}&search=${search}`)
-
+//   const res = await API.get("/users")
 //   setUsers(res.data.users)
-
 //  }
 
 //  useEffect(()=>{
 //   fetchUsers()
-//  },[page,search])
+//  },[])
+
+//  const createUser = async()=>{
+
+//   await API.post("/users",{
+//    name,
+//    email
+//   })
+
+//   setName("")
+//   setEmail("")
+
+//   fetchUsers()
+//  }
+
+//  const deleteUser = async(id)=>{
+
+//   await API.delete(`/users/${id}`)
+//   fetchUsers()
+
+//  }
 
 //  return(
 
-//   <div style={{display:"flex"}}>
+//   <div style={{padding:"20px"}}>
 
-//    <Sidebar/>
+//    <h2>Users</h2>
 
-//    <div style={{flex:1}}>
-
-//     <Navbar/>
-
-//     <h2>Users</h2>
+//    <div style={{display:"flex",gap:"10px",marginBottom:"20px"}}>
 
 //     <input
-//      placeholder="Search users"
-//      onChange={(e)=>setSearch(e.target.value)}
+//      placeholder="Name"
+//      value={name}
+//      onChange={(e)=>setName(e.target.value)}
 //     />
 
-//     <table border="1">
+//     <input
+//      placeholder="Email"
+//      value={email}
+//      onChange={(e)=>setEmail(e.target.value)}
+//     />
 
-//      <thead>
-
-//       <tr>
-//        <th>ID</th>
-//        <th>Name</th>
-//        <th>Email</th>
-//        <th>Role</th>
-//       </tr>
-
-//      </thead>
-
-//      <tbody>
-
-//       {users.map((user)=>(
-//        <tr key={user.id}>
-
-//         <td>{user.id}</td>
-//         <td>{user.name}</td>
-//         <td>{user.email}</td>
-//         <td>{user.role}</td>
-
-//        </tr>
-//       ))}
-
-//      </tbody>
-
-//     </table>
-
-//     <button onClick={()=>setPage(page-1)}>
-//      Prev
-//     </button>
-
-//     <button onClick={()=>setPage(page+1)}>
-//      Next
+//     <button onClick={createUser}>
+//      Create
 //     </button>
 
 //    </div>
+
+//    <table border="1" width="100%">
+
+//     <thead>
+
+//      <tr>
+//       <th>Name</th>
+//       <th>Email</th>
+//       <th>Action</th>
+//      </tr>
+
+//     </thead>
+
+//     <tbody>
+
+//      {users.map(u=>(
+
+//       <tr key={u.id}>
+
+//        <td>{u.name}</td>
+//        <td>{u.email}</td>
+
+//        <td>
+
+//         <button onClick={()=>deleteUser(u.id)}>
+//          Delete
+//         </button>
+
+//        </td>
+
+//       </tr>
+
+//      ))}
+
+//     </tbody>
+
+//    </table>
 
 //   </div>
 
@@ -86,107 +109,240 @@
 
 // export default Users
 
-import { useEffect, useState } from "react";
-import API from "../api/axios";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+import { useEffect, useState } from "react"
+import API from "../api/axios"
 
-function Users() {
-  const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
+function Users(){
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
+ const [users,setUsers] = useState([])
+ const [name,setName] = useState("")
+ const [email,setEmail] = useState("")
+ const [password,setPassword] = useState("")
+ const [loading,setLoading] = useState(false)
 
-      const res = await API.get(
-        `/users?page=${page}&search=${search}`
-      );
+ // Fetch Users
+ const fetchUsers = async ()=>{
 
-      setUsers(res.data.users || []);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to fetch users");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try{
 
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchUsers();
-    }, 500); // debounce
+   const res = await API.get("/users")
 
-    return () => clearTimeout(delay);
-  }, [page, search]);
+   setUsers(res.data.users)
 
-  return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
+  }catch(err){
+   console.error(err)
+  }
 
-      <div style={{ flex: 1 }}>
-        <Navbar />
+ }
 
-        <h2>Users</h2>
+ useEffect(()=>{
+  fetchUsers()
+ },[])
 
-        <input
-          placeholder="Search users"
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1); // reset page on search
+ // Create User
+ const createUser = async ()=>{
+
+  if(!name || !email || !password){
+   alert("Please fill all fields")
+   return
+  }
+
+  try{
+
+   setLoading(true)
+
+   await API.post("/users",{
+    name,
+    email,
+    password,
+    role:"USER"
+   })
+
+   setName("")
+   setEmail("")
+   setPassword("")
+
+   fetchUsers()
+
+  }catch(err){
+   console.error(err)
+  }finally{
+   setLoading(false)
+  }
+
+ }
+
+ // Delete User
+ const deleteUser = async(id)=>{
+
+  try{
+
+   await API.delete(`/users/${id}`)
+
+   fetchUsers()
+
+  }catch(err){
+   console.error(err)
+  }
+
+ }
+
+ return(
+
+  <div style={{padding:"20px"}}>
+
+   <h2 style={{marginBottom:"20px"}}>
+    Users
+   </h2>
+
+   {/* Form */}
+
+   <div style={{
+    border:"1px solid #ccc",
+    padding:"15px",
+    borderRadius:"6px",
+    marginBottom:"20px",
+    display:"flex",
+    gap:"10px"
+   }}>
+
+    <input
+     placeholder="Name"
+     value={name}
+     onChange={(e)=>setName(e.target.value)}
+     style={{
+      padding:"8px",
+      border:"1px solid #ccc",
+      borderRadius:"4px"
+     }}
+    />
+
+    <input
+     placeholder="Email"
+     value={email}
+     onChange={(e)=>setEmail(e.target.value)}
+     style={{
+      padding:"8px",
+      border:"1px solid #ccc",
+      borderRadius:"4px"
+     }}
+    />
+
+    <input
+     type="password"
+     placeholder="Password"
+     value={password}
+     onChange={(e)=>setPassword(e.target.value)}
+     style={{
+      padding:"8px",
+      border:"1px solid #ccc",
+      borderRadius:"4px"
+     }}
+    />
+
+    <button
+     onClick={createUser}
+     disabled={loading}
+     style={{
+      background:"#2563eb",
+      color:"white",
+      border:"none",
+      padding:"8px 15px",
+      borderRadius:"4px",
+      cursor:"pointer"
+     }}
+    >
+     {loading ? "Creating..." : "Create"}
+    </button>
+
+   </div>
+
+
+   {/* Users Table */}
+
+   <table style={{
+    width:"100%",
+    borderCollapse:"collapse"
+   }}>
+
+    <thead>
+
+     <tr style={{background:"#f3f4f6"}}>
+
+      <th style={{border:"1px solid #ccc",padding:"10px"}}>
+       Name
+      </th>
+
+      <th style={{border:"1px solid #ccc",padding:"10px"}}>
+       Email
+      </th>
+
+      <th style={{border:"1px solid #ccc",padding:"10px"}}>
+       Action
+      </th>
+
+     </tr>
+
+    </thead>
+
+    <tbody>
+
+     {users.length === 0 ? (
+
+      <tr>
+
+       <td colSpan="3" style={{padding:"15px",textAlign:"center"}}>
+        No users found
+       </td>
+
+      </tr>
+
+     ) : (
+
+      users.map(user=>(
+
+       <tr key={user.id}>
+
+        <td style={{border:"1px solid #ccc",padding:"10px"}}>
+         {user.name}
+        </td>
+
+        <td style={{border:"1px solid #ccc",padding:"10px"}}>
+         {user.email}
+        </td>
+
+        <td style={{border:"1px solid #ccc",padding:"10px"}}>
+
+         <button
+          onClick={()=>deleteUser(user.id)}
+          style={{
+           background:"#ef4444",
+           color:"white",
+           border:"none",
+           padding:"6px 10px",
+           borderRadius:"4px",
+           cursor:"pointer"
           }}
-        />
+         >
+          Delete
+         </button>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <table border="1">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-              </tr>
-            </thead>
+        </td>
 
-            <tbody>
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan="4">No users found</td>
-                </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+       </tr>
 
-        <div style={{ marginTop: "10px" }}>
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
-            Prev
-          </button>
+      ))
 
-          <span style={{ margin: "0 10px" }}>Page: {page}</span>
+     )}
 
-          <button onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    </tbody>
+
+   </table>
+
+  </div>
+
+ )
+
 }
 
-export default Users;
+export default Users

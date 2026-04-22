@@ -13,19 +13,25 @@ model User {
   name     String
   email    String @unique
   password String
-  role     String
+  role     Role
 
-  societyId Int?
-  society   Society? @relation(fields: [societyId], references: [id])
+  societyId  Int? //optional 
+  society    Society?    @relation(fields: [societyId], references: [id])
+  complaints Complaint[]
 
   createdAt DateTime @default(now())
 }
 
 model Society {
-  id        Int      @id @default(autoincrement())
-  name      String
-  user      User[]
-  createdAt DateTime @default(now())
+  id      Int    @id @default(autoincrement())
+  name    String
+  address String
+  city    String
+
+  users      User[]
+  complaints Complaint[]
+  createdAt  DateTime    @default(now())
+  flats      Flat[]
 }
 
 enum Role {
@@ -33,16 +39,65 @@ enum Role {
   ADMIN
   RESIDENT
   TENANT
-  GUARD
+  SECURITY
   ACCOUNTANT
 }
 
 model Complaint {
-  id          String   @id @default(uuid())
+  id          Int    @id @default(autoincrement())
   title       String
   description String
-  status      String   @default("OPEN")
-  userId      String
-  societyId   Int?
-  createdAt   DateTime @default(now())
+  status      String @default("OPEN")
+
+  userId    Int
+  societyId Int
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  society Society @relation(fields: [societyId], references: [id])
+}
+
+model Flat {
+  id        Int    @id @default(autoincrement())
+  block     String
+  flatNo    String
+  societyId Int
+
+  society Society @relation(fields: [societyId], references: [id])
+}
+
+model Visitor {
+  id      Int    @id @default(autoincrement())
+  name    String
+  phone   String
+  vehicle String
+   residentId Int
+  checkIn    DateTime  @default(now())
+  checkOut   DateTime?
+}
+
+model Notice {
+  id        Int      @id @default(autoincrement())
+  title     String
+  message   String
+  societyId Int
+  createdAt DateTime @default(now())
+}
+
+model Maintenance {
+  id     Int    @id @default(autoincrement())
+  amount Float
+  month  String
+  userId Int
+  status String
+}
+
+model Booking {
+ id      Int @id @default(autoincrement())
+ amenity String
+ date    DateTime
+ slot    String
+ userId  Int
+ status  String @default("PENDING")
 }

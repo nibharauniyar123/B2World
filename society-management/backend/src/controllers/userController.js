@@ -14,8 +14,10 @@ export const createUser = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        role,
-        societyId: req.user.societyId, // ✅ SaaS FIX
+        // role,
+         role: role || "USER",
+         societyId: 1,
+        // societyId: req.user.societyId, // ✅ SaaS FIX
       },
     });
 
