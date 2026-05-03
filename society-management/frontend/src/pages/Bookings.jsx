@@ -1,51 +1,511 @@
-import { useEffect,useState } from "react";
-import API from "../api/api";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-export default function Bookings(){
+import axios from "../utils/axios";
 
- const [bookings,setBookings] = useState([]);
+function Bookings() {
+  const [data, setData] =
+    useState([]);
 
- useEffect(()=>{
-  loadBookings();
- },[]);
+  const [users, setUsers] =
+    useState([]);
 
- const loadBookings = async()=>{
-  const res = await API.get("/bookings");
-  setBookings(res.data);
- }
+  const [form, setForm] =
+    useState({
+      amenity: "",
+      date: "",
+      slot: "",
+      userId: "",
+    });
 
- return(
+  const [loading, setLoading] =
+    useState(false);
 
-  <div>
+  const fetchData =
+    async () => {
+      const res =
+        await axios.get(
+          "/bookings"
+        );
 
-   <h2>Bookings</h2>
+      const userRes =
+        await axios.get(
+          "/users"
+        );
 
-   <table border="1">
+      setData(
+        res.data
+      );
 
-    <thead>
-      <tr>
-        <th>Amenity</th>
-        <th>Date</th>
-        <th>Status</th>
-      </tr>
-    </thead>
+      setUsers(
+        userRes.data.users ||
+          userRes.data
+      );
+    };
 
-    <tbody>
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-      {bookings.map(b=>(
-        <tr key={b.id}>
-          <td>{b.amenity}</td>
-          <td>{b.date}</td>
-          <td>{b.status}</td>
-        </tr>
-      ))}
+  const handleCreate =
+    async (e) => {
+      e.preventDefault();
 
-    </tbody>
+      try {
+        setLoading(true);
 
-   </table>
+        await axios.post(
+          "/bookings",
+          form
+        );
 
-  </div>
+        setForm({
+          amenity:
+            "",
+          date: "",
+          slot: "",
+          userId:
+            "",
+        });
 
- )
+        fetchData();
+      } catch {
+        alert(
+          "Booking Failed"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  const handleDelete =
+    async (id) => {
+      await axios.delete(
+        `/bookings/${id}`
+      );
+
+      fetchData();
+    };
+
+  const updateStatus =
+    async (
+      id,
+      status
+    ) => {
+      await axios.put(
+        `/bookings/${id}`,
+        { status }
+      );
+
+      fetchData();
+    };
+
+  return (
+    <div style={styles.page}>
+      <h1 style={styles.title}>
+        Booking
+        Management
+      </h1>
+
+      {/* FORM */}
+      <form
+        onSubmit={
+          handleCreate
+        }
+        style={styles.form}
+      >
+        <select
+          value={
+            form.amenity
+          }
+          onChange={(e) =>
+            setForm({
+              ...form,
+              amenity:
+                e.target
+                  .value,
+            })
+          }
+          style={styles.input}
+          required
+        >
+          <option value="">
+            Select
+            Amenity
+          </option>
+          <option>
+            Hall
+          </option>
+          <option>
+            Gym
+          </option>
+          <option>
+            Parking
+          </option>
+          <option>
+            Garden
+          </option>
+        </select>
+
+        <input
+          type="date"
+          value={
+            form.date
+          }
+          onChange={(e) =>
+            setForm({
+              ...form,
+              date:
+                e.target
+                  .value,
+            })
+          }
+          style={styles.input}
+          required
+        />
+
+        <select
+          value={
+            form.slot
+          }
+          onChange={(e) =>
+            setForm({
+              ...form,
+              slot:
+                e.target
+                  .value,
+            })
+          }
+          style={styles.input}
+          required
+        >
+          <option value="">
+            Select Slot
+          </option>
+          <option>
+            7AM-9AM
+          </option>
+          <option>
+            10AM-12PM
+          </option>
+          <option>
+            1PM-3PM
+          </option>
+          <option>
+            4PM-6PM
+          </option>
+        </select>
+
+        <select
+          value={
+            form.userId
+          }
+          onChange={(e) =>
+            setForm({
+              ...form,
+              userId:
+                e.target
+                  .value,
+            })
+          }
+          style={styles.input}
+          required
+        >
+          <option value="">
+            Select User
+          </option>
+
+          {users.map(
+            (
+              user
+            ) => (
+              <option
+                key={
+                  user.id
+                }
+                value={
+                  user.id
+                }
+              >
+                {
+                  user.name
+                }
+              </option>
+            )
+          )}
+        </select>
+
+        <button
+          style={
+            styles.button
+          }
+        >
+          {loading
+            ? "Booking..."
+            : "Create Booking"}
+        </button>
+      </form>
+
+      {/* TABLE */}
+      <div
+        style={
+          styles.card
+        }
+      >
+        <table
+          style={
+            styles.table
+          }
+        >
+          <thead>
+            <tr>
+              <th
+                style={
+                  styles.th
+                }
+              >
+                Amenity
+              </th>
+              <th
+                style={
+                  styles.th
+                }
+              >
+                Date
+              </th>
+              <th
+                style={
+                  styles.th
+                }
+              >
+                Slot
+              </th>
+              <th
+                style={
+                  styles.th
+                }
+              >
+                Status
+              </th>
+              <th
+                style={
+                  styles.th
+                }
+              >
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {data.map(
+              (
+                item
+              ) => (
+                <tr
+                  key={
+                    item.id
+                  }
+                >
+                  <td
+                    style={
+                      styles.td
+                    }
+                  >
+                    {
+                      item.amenity
+                    }
+                  </td>
+
+                  <td
+                    style={
+                      styles.td
+                    }
+                  >
+                    {new Date(
+                      item.date
+                    ).toLocaleDateString()}
+                  </td>
+
+                  <td
+                    style={
+                      styles.td
+                    }
+                  >
+                    {
+                      item.slot
+                    }
+                  </td>
+
+                  <td
+                    style={
+                      styles.td
+                    }
+                  >
+                    <select
+                      value={
+                        item.status
+                      }
+                      onChange={(
+                        e
+                      ) =>
+                        updateStatus(
+                          item.id,
+                          e
+                            .target
+                            .value
+                        )
+                      }
+                      style={
+                        styles.input
+                      }
+                    >
+                      <option>
+                        PENDING
+                      </option>
+                      <option>
+                        APPROVED
+                      </option>
+                      <option>
+                        REJECTED
+                      </option>
+                    </select>
+                  </td>
+
+                  <td
+                    style={
+                      styles.td
+                    }
+                  >
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          item.id
+                        )
+                      }
+                      style={
+                        styles.delete
+                      }
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
+export default Bookings;
+
+// CSS
+const styles = {
+  page: {
+    padding: "30px",
+    background:
+      "#f4f7fb",
+    minHeight:
+      "100vh",
+  },
+
+  title: {
+    fontSize:
+      "38px",
+    fontWeight:
+      "700",
+    marginBottom:
+      "25px",
+  },
+
+  form: {
+    display:
+      "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit,minmax(220px,1fr))",
+    gap: "15px",
+    background:
+      "#fff",
+    padding:
+      "25px",
+    borderRadius:
+      "18px",
+    marginBottom:
+      "30px",
+  },
+
+  input: {
+    padding:
+      "14px",
+    border:
+      "1px solid #ddd",
+    borderRadius:
+      "12px",
+  },
+
+  button: {
+    background:
+      "#2563eb",
+    color:
+      "#fff",
+    border:
+      "none",
+    borderRadius:
+      "12px",
+    cursor:
+      "pointer",
+    fontWeight:
+      "600",
+  },
+
+  card: {
+    background:
+      "#fff",
+    borderRadius:
+      "18px",
+    overflow:
+      "hidden",
+  },
+
+  table: {
+    width: "100%",
+    borderCollapse:
+      "collapse",
+  },
+
+  th: {
+    background:
+      "#eef2f7",
+    padding:
+      "16px",
+    textAlign:
+      "left",
+  },
+
+  td: {
+    padding:
+      "16px",
+    borderTop:
+      "1px solid #eee",
+  },
+
+  delete: {
+    background:
+      "#ef4444",
+    color:
+      "#fff",
+    border:
+      "none",
+    padding:
+      "10px 14px",
+    borderRadius:
+      "10px",
+    cursor:
+      "pointer",
+  },
+};

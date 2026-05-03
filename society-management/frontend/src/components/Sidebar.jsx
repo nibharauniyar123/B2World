@@ -1,52 +1,100 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  FaTachometerAlt,
+  FaUsers,
+  FaBuilding,
+  FaHome,
+  FaUserFriends,
+  FaExclamationCircle,
+  FaTools,
+  FaCalendarCheck,
+  FaBars,
+} from "react-icons/fa";
 
-function Sidebar(){
+function Sidebar({ collapsed, setCollapsed }) {
+  const navigate = useNavigate();
 
- return(
+  const menu = [
+    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
+    { name: "Users", icon: <FaUsers />, path: "/users" },
+    { name: "Societies", icon: <FaBuilding />, path: "/societies" },
+    { name: "Flats", icon: <FaHome />, path: "/flats" },
+    { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
+    { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
+    { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
+    { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
+  ];
 
-  <div style={{width:"200px",background:"#222",color:"#fff",height:"100vh"}}>
+  return (
+    <div
+      style={{
+        ...styles.sidebar,
+        width: collapsed ? "80px" : "220px",
+      }}
+    >
+      {/* Toggle */}
+      <div
+        style={styles.toggle}
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        <FaBars />
+      </div>
 
-   <h2 style={{padding:"20px"}}>Admin</h2>
+      <h2 style={styles.logo}>
+        {collapsed ? "S" : "Society"}
+      </h2>
 
-   <ul style={{listStyle:"none"}}>
-
-    <li>
-      <Link to="/dashboard">Dashboard</Link>
-    </li>
-
-    <li>
-      <Link to="/users">Users</Link>
-    </li>
-
-    <li>
-      <Link to="/societies">Societies</Link>
-    </li>
-    <li>
-      <Link to="/visitors">Visitors</Link>  
-    </li>
-    <li>
-      <Link to="/complaints">Complaints</Link>
-    </li>
-    <li>
-      <Link to="/flats">Flats</Link>  
-    </li>
-    <li>
-      <Link to="/notices">Notices</Link>
-    </li>
-    <li>
-      <Link to="/bookings">Bookings</Link>
-    </li>
-    <li>
-      <Link to="/maintenance">Maintenance</Link>
-    </li>
-   
-    
-
-   </ul>
-
-  </div>
-
- )
+      {menu.map((item) => (
+        <div
+          key={item.name}
+          style={styles.menuItem}
+          onClick={() => navigate(item.path)}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "#1e293b")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "transparent")
+          }
+        >
+          <span>{item.icon}</span>
+          {!collapsed && <span>{item.name}</span>}
+        </div>
+      ))}
+    </div>
+  );
 }
 
-  export default Sidebar
+const styles = {
+  sidebar: {
+    height: "100vh",
+    background: "#0f172a",
+    color: "#fff",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    padding: "20px 10px",
+    transition: "0.3s",
+  },
+
+  logo: {
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+
+  toggle: {
+    cursor: "pointer",
+    marginBottom: "20px",
+  },
+
+  menuItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "10px",
+    cursor: "pointer",
+    borderRadius: "6px",
+    transition: "0.2s",
+  },
+};
+
+export default Sidebar;

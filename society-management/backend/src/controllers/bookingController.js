@@ -1,35 +1,121 @@
-import prisma from "../config/prisma.js"
+import { PrismaClient } from "@prisma/client";
 
-export const createBooking = async (req,res)=>{
- try{
+const prisma = new PrismaClient();
 
-  const { amenity, date, slot, userId } = req.body
+// GET ALL
+export const getBookings =
+  async (req, res) => {
+    try {
+      const data =
+        await prisma.booking.findMany({
+          orderBy: {
+            id: "desc",
+          },
+        });
 
-  const booking = await prisma.booking.create({
-   data:{
-    amenity,
-    date:new Date(date),    
-    slot,
-    userId,
-    status: "pending"
-   }
-  })
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error.message,
+      });
+    }
+  };
 
-  res.json(booking)
+// CREATE
+export const createBooking =
+  async (req, res) => {
+    try {
+      const {
+        amenity,
+        date,
+        slot,
+        userId,
+      } = req.body;
 
- }catch(error){
-  res.status(500).json({error:error.message})
- }
-}
+      const data =
+        await prisma.booking.create({
+          data: {
+            amenity,
+            date: new Date(date),
+            slot,
+            userId:
+              parseInt(
+                userId
+              ),
+            status:
+              "PENDING",
+          },
+        });
 
-export const getBookings = async (req,res)=>{
- try{
+      res.status(201).json(
+        data
+      );
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error.message,
+      });
+    }
+  };
 
-  const bookings = await prisma.booking.findMany()
+// DELETE
+export const deleteBooking =
+  async (req, res) => {
+    try {
+      const id =
+        parseInt(
+          req.params.id
+        );
 
-  res.json(bookings)
+      await prisma.booking.delete({
+        where: {
+          id,
+        },
+      });
 
- }catch(error){
-  res.status(500).json({error:error.message})
- }
-}
+      res.json({
+        message:
+          "Deleted",
+      });
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error.message,
+      });
+    }
+  };
+
+// UPDATE STATUS
+export const updateBooking =
+  async (req, res) => {
+    try {
+      const id =
+        parseInt(
+          req.params.id
+        );
+
+      const {
+        status,
+      } = req.body;
+
+      const updated =
+        await prisma.booking.update({
+          where: {
+            id,
+          },
+          data: {
+            status,
+          },
+        });
+
+      res.json(
+        updated
+      );
+    } catch (error) {
+      res.status(500).json({
+        error:
+          error.message,
+      });
+    }
+  };

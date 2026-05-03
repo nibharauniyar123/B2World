@@ -1,54 +1,107 @@
-import prisma from "../config/prisma.js"
+import { PrismaClient } from "@prisma/client";
 
-// CREATE COMPLAINT
-export const createComplaint = async (req,res)=>{
- try{
+const prisma = new PrismaClient();
 
-  const { title, description, societyId } = req.body
+// GET ALL
+export const getComplaints = async (req, res) => {
+  try {
+    const complaints =
+      await prisma.complaint.findMany({
+        orderBy: {
+          id: "desc",
+        },
+      });
 
-  const complaint = await prisma.complaint.create({
-   data:{
-    title,
-    description,
-    status:"PENDING",
+    res.json(complaints);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
 
-    user:{
-     connect:{
-      id:req.user.id
-     }
-    },
+// CREATE
+export const createComplaint = async (
+  req,
+  res
+) => {
+  try {
+    const {
+      title,
+      description,
+      userId,
+      societyId,
+    } = req.body;
 
-    society:{
-     connect:{
-      id:Number(societyId)
-     }
+    const complaint =
+      await prisma.complaint.create({
+        data: {
+          title,
+          description,
+          userId: parseInt(userId),
+          societyId: parseInt(
+            societyId
+          ),
+          status: "OPEN",
+        },
+      });
+
+    res.status(201).json(
+      complaint
+    );
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+// DELETE
+export const deleteComplaint =
+  async (req, res) => {
+    try {
+      const id = parseInt(
+        req.params.id
+      );
+
+      await prisma.complaint.delete({
+        where: { id },
+      });
+
+      res.json({
+        message:
+          "Complaint deleted",
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: error.message,
+      });
     }
+  };
 
-   }
-  })
+// UPDATE STATUS
+export const updateComplaintStatus =
+  async (req, res) => {
+    try {
+      const id = parseInt(
+        req.params.id
+      );
 
-  res.json(complaint)
+      const { status } =
+        req.body;
 
- }catch(error){
-  res.status(500).json({error:error.message})
- }
-}
+      const updated =
+        await prisma.complaint.update({
+          where: { id },
+          data: {
+            status,
+          },
+        });
 
-
-// GET ALL COMPLAINTS
-export const getComplaints = async (req,res)=>{
- try{
-
-  const complaints = await prisma.complaint.findMany({
-   include:{
-    user:true,
-    society:true
-   }
-  })
-
-  res.json(complaints)
-
- }catch(error){
-  res.status(500).json({error:error.message})
- }
-}
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({
+        error: error.message,
+      });
+    }
+  };

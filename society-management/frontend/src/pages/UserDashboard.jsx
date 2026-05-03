@@ -1,109 +1,56 @@
-
-
-import { useEffect, useState } from "react";
-import API from "../api/axios";
+import Layout from "../components/Layout";
+import { useNavigate } from "react-router-dom";
 
 function UserDashboard() {
-
-  const [user, setUser] = useState(null);
-  const [societies, setSocieties] = useState([]);
-
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-
-      try {
-
-        // USER
-        const res = await API.get("/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setUser(res.data);
-
-        // SOCIETIES
-        const soc = await API.get("/society", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setSocieties(soc.data);
-
-      } catch (err) {
-        console.log(err);
-      }
-
-    };
-
-    fetchData();
-
-  }, []);
-
-  // JOIN FUNCTION
-  const joinSociety = async (id) => {
-    try {
-
-      await API.post(`/society/join/${id}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      alert("Joined successfully ✅");
-
-    } catch (err) {
-      alert("Join failed ❌");
-    }
-  };
+  const navigate = useNavigate();
 
   return (
-    <div style={{ padding: "30px" }}>
+    <Layout>
+      <div style={styles.page}>
+        <h1 style={styles.title}>User Dashboard 👤</h1>
+        <p style={styles.sub}>Your activities</p>
 
-      <h1>User Dashboard</h1>
-
-      {/* USER PROFILE */}
-      {user && (
-        <div style={{
-          border: "1px solid gray",
-          padding: "15px",
-          marginBottom: "20px"
-        }}>
-          <h3>Profile</h3>
-          <p>Name: {user.name}</p>
-          <p>Email: {user.email}</p>
-          <p>Role: {user.role}</p>
-        </div>
-      )}
-
-      {/* SOCIETIES */}
-      <h2>Available Societies</h2>
-
-      {societies.length === 0 ? (
-        <p>No societies available</p>
-      ) : (
-        societies.map((s) => (
-          <div key={s.id} style={{
-            border: "1px solid black",
-            padding: "10px",
-            marginBottom: "10px"
-          }}>
-
-            <h3>{s.name}</h3>
-
-            <button onClick={() => joinSociety(s.id)}>
-              Join
-            </button>
-
+        <div style={styles.grid}>
+          <div style={styles.card} onClick={() => navigate("/complaints")}>
+            <h3>📝 My Complaints</h3>
+            <p>Track your complaints</p>
           </div>
-        ))
-      )}
 
-    </div>
+          <div style={styles.card} onClick={() => navigate("/bookings")}>
+            <h3>📅 My Bookings</h3>
+            <p>View your bookings</p>
+          </div>
+
+          <div style={styles.card} onClick={() => navigate("/visitors")}>
+            <h3>🚶 Visitors</h3>
+            <p>Manage visitors</p>
+          </div>
+        </div>
+      </div>
+    </Layout>
   );
 }
 
 export default UserDashboard;
 
+const styles = {
+  page: { padding: "30px" },
+
+  title: { fontSize: "30px", fontWeight: "700" },
+
+  sub: { color: "#6b7280", marginBottom: "20px" },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+    gap: "20px",
+  },
+
+  card: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "15px",
+    boxShadow: "0 5px 15px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+  },
+};

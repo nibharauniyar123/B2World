@@ -33,16 +33,10 @@ model Society {
   createdAt  DateTime    @default(now())
   flats      Flat[]
 }
-
 enum Role {
-  SUPER_ADMIN
   ADMIN
-  RESIDENT
-  TENANT
-  SECURITY
-  ACCOUNTANT
+  USER
 }
-
 model Complaint {
   id          Int    @id @default(autoincrement())
   title       String
@@ -59,12 +53,13 @@ model Complaint {
 }
 
 model Flat {
-  id        Int    @id @default(autoincrement())
-  block     String
-  flatNo    String
-  societyId Int
-
-  society Society @relation(fields: [societyId], references: [id])
+  id         Int      @id @default(autoincrement())
+  block      String
+  flatNo     String
+  floor      String @default("")
+  ownerName  String @default("")
+  societyId  Int
+  society    Society  @relation(fields: [societyId], references: [id])
 }
 
 model Visitor {

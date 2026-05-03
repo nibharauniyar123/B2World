@@ -2,25 +2,30 @@ import { useState } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+function Register() {
   const nav = useNavigate();
 
-  const handleLogin = async (e) => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
 
-      const res = await axios.post("/auth/login", form);
+      await axios.post("/auth/register", form);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      alert("Registered successfully");
 
-      nav("/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      nav("/login");
+    } catch (error) {
+      alert(error.response?.data?.message || "Register failed");
     } finally {
       setLoading(false);
     }
@@ -28,8 +33,18 @@ function Login() {
 
   return (
     <div style={styles.container}>
-      <form onSubmit={handleLogin} style={styles.card}>
-        <h2 style={styles.title}>Login</h2>
+      <form onSubmit={handleRegister} style={styles.card}>
+        <h2 style={styles.title}>Register</h2>
+
+        <input
+          type="text"
+          placeholder="Name"
+          style={styles.input}
+          value={form.name}
+          onChange={(e) =>
+            setForm({ ...form, name: e.target.value })
+          }
+        />
 
         <input
           type="email"
@@ -50,12 +65,9 @@ function Login() {
             setForm({ ...form, password: e.target.value })
           }
         />
-        <p>
-  Don't have account? <a href="/register">Register</a>
-</p>
 
         <button style={styles.button}>
-          {loading ? "Logging..." : "Login"}
+          {loading ? "Registering..." : "Register"}
         </button>
       </form>
     </div>
@@ -90,11 +102,11 @@ const styles = {
   button: {
     width: "100%",
     padding: "12px",
-    background: "#2563eb",
+    background: "#16a34a",
     color: "white",
     border: "none",
     borderRadius: "8px",
   },
 };
 
-export default Login;
+export default Register;

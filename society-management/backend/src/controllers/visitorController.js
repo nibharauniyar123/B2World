@@ -1,22 +1,68 @@
-import prisma from "../prisma/prismaClient.js";
+import { PrismaClient } from "@prisma/client";
 
-export const createVisitor = async(req,res)=>{
- const {name,phone,vehicle,residentId}=req.body;
+const prisma = new PrismaClient();
 
- const visitor = await prisma.visitor.create({
-  data:{
-   name,
-   phone,
-   vehicle,
-   residentId
+// GET ALL
+export const getVisitors = async (req, res) => {
+  try {
+    const visitors = await prisma.visitor.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    res.json(visitors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
- });
-
- res.json(visitor);
 };
 
-export const getVisitors = async(req,res)=>{
- const visitors = await prisma.visitor.findMany();
+// CREATE
+export const createVisitor = async (req, res) => {
+  try {
+    const {
+      name,
+      phone,
+      vehicle,
+      residentId,
+    } = req.body;
 
- res.json(visitors);
+    const visitor =
+      await prisma.visitor.create({
+        data: {
+          name,
+          phone,
+          vehicle,
+          residentId: parseInt(
+            residentId
+          ),
+        },
+      });
+
+    res.status(201).json(visitor);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// DELETE
+export const deleteVisitor = async (
+  req,
+  res
+) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    await prisma.visitor.delete({
+      where: { id },
+    });
+
+    res.json({
+      message: "Deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
 };

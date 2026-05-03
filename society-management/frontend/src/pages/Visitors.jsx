@@ -1,281 +1,266 @@
-import { useEffect,useState } from "react"
-import API from "../api/axios"
+import { useEffect, useState } from "react";
+import axios from "../utils/axios";
 
-function Visitors(){
+function Visitors() {
+  const [visitors, setVisitors] = useState([]);
 
- const [visitors,setVisitors] = useState([])
- const [name,setName] = useState("")
- const [phone,setPhone] = useState("")
- const [vehicle,setVehicle] = useState("")
- const [residentId,setResidentId] = useState("")
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    vehicle: "",
+    residentId: "",
+  });
 
- const fetchVisitors = async()=>{
-  const res = await API.get("/visitors")
-  setVisitors(res.data)
- }
+  const fetchVisitors = async () => {
+    const res = await axios.get(
+      "/visitors"
+    );
+    setVisitors(res.data);
+  };
 
- useEffect(()=>{
-  fetchVisitors()
- },[])
+  useEffect(() => {
+    fetchVisitors();
+  }, []);
 
- const createVisitor = async()=>{
+  const handleCreate = async (e) => {
+    e.preventDefault();
 
-  await API.post("/visitors",{
-   name,
-   phone,
-   vehicle,
-   residentId
-  })
+    await axios.post(
+      "/visitors",
+      form
+    );
 
-  fetchVisitors()
- }
+    setForm({
+      name: "",
+      phone: "",
+      vehicle: "",
+      residentId: "",
+    });
 
- return(
+    fetchVisitors();
+  };
 
-  <div>
+  const handleDelete = async (id) => {
+    await axios.delete(
+      `/visitors/${id}`
+    );
 
-   <h2>Visitors</h2>
+    fetchVisitors();
+  };
 
-   <input
-    placeholder="Name"
-    onChange={(e)=>setName(e.target.value)}
-   />
+  return (
+    <div style={styles.page}>
+      <h1 style={styles.title}>
+        Visitors Management
+      </h1>
 
-   <input
-    placeholder="Phone"
-    onChange={(e)=>setPhone(e.target.value)}
-   />
+      {/* FORM */}
+      <form
+        onSubmit={handleCreate}
+        style={styles.form}
+      >
+        <input
+          placeholder="Visitor Name"
+          value={form.name}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              name: e.target.value,
+            })
+          }
+          style={styles.input}
+          required
+        />
 
-   <input
-    placeholder="Vehicle"
-    onChange={(e)=>setVehicle(e.target.value)}
-   />
+        <input
+          placeholder="Phone"
+          value={form.phone}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              phone: e.target.value,
+            })
+          }
+          style={styles.input}
+          required
+        />
 
-   <input
-    placeholder="Resident ID"
-    onChange={(e)=>setResidentId(e.target.value)}
-   />
+        <input
+          placeholder="Vehicle No"
+          value={form.vehicle}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              vehicle:
+                e.target.value,
+            })
+          }
+          style={styles.input}
+          required
+        />
 
-   <button onClick={createVisitor}>
-    Add Visitor
-   </button>
+        <input
+          placeholder="Resident ID"
+          value={form.residentId}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              residentId:
+                e.target.value,
+            })
+          }
+          style={styles.input}
+          required
+        />
 
-<table style={styles.table}>
+        <button style={styles.createBtn}>
+          Add Visitor
+        </button>
+      </form>
 
-    <thead>
-     <tr style={styles.tableHeader}>
-      <th style={styles.th}>Name</th>
-      <th style={styles.th}>Phone</th>
-      <th style={styles.th}>Vehicle</th>
-      <th style={styles.th}>Resident</th>
-     </tr>
-    </thead>
+      {/* TABLE */}
+      <div style={styles.tableCard}>
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.head}>
+              <th style={styles.th}>
+                Name
+              </th>
+              <th style={styles.th}>
+                Phone
+              </th>
+              <th style={styles.th}>
+                Vehicle
+              </th>
+              <th style={styles.th}>
+                Resident ID
+              </th>
+              <th style={styles.th}>
+                Check In
+              </th>
+              <th style={styles.th}>
+                Action
+              </th>
+            </tr>
+          </thead>
 
-    <tbody>
+          <tbody>
+            {visitors.map((item) => (
+              <tr key={item.id}>
+                <td style={styles.td}>
+                  {item.name}
+                </td>
+                <td style={styles.td}>
+                  {item.phone}
+                </td>
+                <td style={styles.td}>
+                  {item.vehicle}
+                </td>
+                <td style={styles.td}>
+                  {item.residentId}
+                </td>
+                <td style={styles.td}>
+                  {new Date(
+                    item.checkIn
+                  ).toLocaleString()}
+                </td>
 
-     {visitors.map(v=>(
-      <tr key={v.id} style={styles.tr}>
-       <td style={styles.td}>{v.name}</td>
-       <td style={styles.td}>{v.phone}</td>
-       <td style={styles.td}>{v.vehicle}</td>
-       <td style={styles.td}>{v.residentId}</td>
-      </tr>
-     ))}
-
-    </tbody>
-
-   </table>
-
-  </div>
-
- )
+                <td style={styles.td}>
+                  <button
+                    onClick={() =>
+                      handleDelete(
+                        item.id
+                      )
+                    }
+                    style={
+                      styles.deleteBtn
+                    }
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
+export default Visitors;
+
+// INLINE CSS
 const styles = {
+  page: {
+    padding: "30px",
+    background: "#f4f7fb",
+    minHeight: "100vh",
+  },
 
- container:{
-  padding:"20px",
-  fontFamily:"Arial"
- },
+  title: {
+    fontSize: "38px",
+    fontWeight: "700",
+    marginBottom: "25px",
+  },
 
- title:{
-  marginBottom:"20px"
- },
+  form: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit,minmax(200px,1fr))",
+    gap: "15px",
+    background: "#fff",
+    padding: "25px",
+    borderRadius: "18px",
+    marginBottom: "30px",
+  },
 
- form:{
-  marginBottom:"20px",
-  display:"flex",
-  gap:"10px"
- },
+  input: {
+    padding: "14px",
+    border: "1px solid #ddd",
+    borderRadius: "12px",
+  },
 
- input:{
-  padding:"8px",
-  border:"1px solid #ccc",
-  borderRadius:"5px"
- },
+  createBtn: {
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    borderRadius: "12px",
+    cursor: "pointer",
+    fontWeight: "600",
+  },
 
- button:{
-  padding:"8px 14px",
-  background:"#2563eb",
-  color:"#fff",
-  border:"none",
-  borderRadius:"5px",
-  cursor:"pointer"
- },
+  tableCard: {
+    background: "#fff",
+    borderRadius: "18px",
+    overflow: "hidden",
+  },
 
- table:{
-  width:"100%",
-  borderCollapse:"collapse"
- },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
 
- tableHeader:{
-  background:"#f3f4f6"
- },
+  head: {
+    background: "#eef2f7",
+  },
 
- th:{
-  border:"1px solid #ddd",
-  padding:"10px",
-  textAlign:"left"
- },
+  th: {
+    padding: "15px",
+    textAlign: "left",
+  },
 
- td:{
-  border:"1px solid #ddd",
-  padding:"10px"
- },
+  td: {
+    padding: "15px",
+    borderTop: "1px solid #eee",
+  },
 
- tr:{
-  background:"#fff"
- }
-
-}
-
-export default Visitors
-
-// import {useEffect,useState} from "react"
-// import API from "../api/axios"
-
-// function Visitors(){
-
-//  const [visitors,setVisitors] = useState([])
-//  const [name,setName] = useState("")
-//  const [phone,setPhone] = useState("")
-//  const [vehicle,setVehicle] = useState("")
-//  const [residentId,setResidentId] = useState("")
-
-//  const fetchVisitors = async()=>{
-//   const res = await API.get("/visitors")
-//   setVisitors(res.data)
-//  }
-
-//  useEffect(()=>{
-//   fetchVisitors()
-//  },[])
-
-//  const createVisitor = async()=>{
-
-//   await API.post("/visitors",{
-//    name,
-//    phone,
-//    vehicle,
-//    residentId
-//   })
-
-//   fetchVisitors()
-//  }
-
-//  const deleteVisitor = async(id)=>{
-//   await API.delete(`/visitors/${id}`)
-//   fetchVisitors()
-//  }
-
-//  return(
-
-//  <div>
-
-//  <h2 className="text-xl font-bold mb-4">
-//  Visitors
-//  </h2>
-
-//  <div className="flex gap-3 mb-4">
-
-//  <input
-//  className="border p-2"
-//  placeholder="Name"
-//  onChange={(e)=>setName(e.target.value)}
-//  />
-
-//  <input
-//  className="border p-2"
-//  placeholder="Phone"
-//  onChange={(e)=>setPhone(e.target.value)}
-//  />
-
-//  <input
-//  className="border p-2"
-//  placeholder="Vehicle"
-//  onChange={(e)=>setVehicle(e.target.value)}
-//  />
-
-//  <input
-//  className="border p-2"
-//  placeholder="Resident ID"
-//  onChange={(e)=>setResidentId(e.target.value)}
-//  />
-
-//  <button
-//  onClick={createVisitor}
-//  className="bg-blue-500 text-white px-4 py-2"
-//  >
-//  Add
-//  </button>
-
-//  </div>
-
-//  <table className="w-full border">
-
-//  <thead className="bg-gray-100">
-
-//  <tr>
-//  <th className="border p-2">Name</th>
-//  <th className="border p-2">Phone</th>
-//  <th className="border p-2">Vehicle</th>
-//  <th className="border p-2">Resident ID</th>
-//  <th className="border p-2">Action</th>
-//  </tr>
-
-//  </thead>
-
-//  <tbody>
-
-//  {visitors.map(v=>(
-//  <tr key={v.id}>
-//  <td className="border p-2">{v.name}</td>
-//  <td className="border p-2">{v.phone}</td>
-//  <td className="border p-2">{v.vehicle}</td>
-//     <td className="border p-2">{v.residentId}</td>
-
-//  <td className="border p-2">
-
-//  <button
-//  onClick={()=>deleteVisitor(v.id)}
-//  className="bg-red-500 text-white px-3 py-1"
-//  >
-//  Delete
-//  </button>
-
-//  </td>
-
-//  </tr>
-//  ))}
-
-//  </tbody>
-
-//  </table>
-
-//  </div>
-
-//  )
-
-// }
-
-// export default Visitors
+  deleteBtn: {
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    padding: "10px 14px",
+    borderRadius: "10px",
+    cursor: "pointer",
+  },
+};

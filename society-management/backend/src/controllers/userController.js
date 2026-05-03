@@ -1,12 +1,10 @@
-import prisma from "../prisma/prismaClient.js";
-import bcrypt from "bcrypt";
+import prisma from "../config/prisma.js";
+import bcrypt from "bcryptjs";
 
-// CREATE USER
 export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -14,69 +12,69 @@ export const createUser = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        // role,
-         role: role || "USER",
-         societyId: 1,
-        // societyId: req.user.societyId, // ✅ SaaS FIX
+        // societyId: 1,
+        role: role || "USER",   // ✅ FIXED
       },
     });
 
-    res.json({ message: "User created", user });
+    res.status(201).json(user);
+
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
-
-// GET USERS (pagination + search + role + SaaS)
 export const getUsers = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const search = req.query.search || "";
-    const role = req.query.role || "";
 
-    const skip = (page - 1) * limit;
+    const users = await prisma.user.findMany()
+    //   where:
+    //     societyId:1
+    //   }
+    // })
 
-    const users = await prisma.user.findMany({
-      where: {
-        societyId: req.user.societyId, // ✅ IMPORTANT
-        name: {
-          contains: search,
-          mode: "insensitive",
-        },
-        ...(role && { role }),
-      },
-      skip,
-      take: limit,
-    });
+    res.json(users)
 
-    const totalUsers = await prisma.user.count({
-      where: {
-        societyId: req.user.societyId,
-      },
-    });
-
-    res.json({ users, totalUsers, page, limit });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("GET USERS ERROR:", error)
+    res.status(500).json({ error: error.message })
   }
-};
-
+}
 // DELETE USER
+// export const deleteUser = async (req, res) => {
+//   try {
+//     const id = req.params.id;
+
+//     await prisma.user.delete({
+//       where: { id },
+//     });
+
+//     res.json({ message: "User removed" });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 export const deleteUser = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
 
     await prisma.user.delete({
       where: { id },
     });
 
-    res.json({ message: "User removed" });
+    res.json({
+      success: true,
+      message: "User deleted successfully",
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log("Delete User Error:", error);
+
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
-
 // CHANGE ROLE
 export const changeUserRole = async (req, res) => {
   try {

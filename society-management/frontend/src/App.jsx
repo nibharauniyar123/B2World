@@ -16,6 +16,8 @@ import Flats from "./pages/Flats";
 import Notices from "./pages/Notices";
 import Visitors from "./pages/Visitors";
 import Maintenance from "./pages/Maintenance";
+import Register from "./pages/Register";
+import AdminDashboard from "./pages/AdminDashboard";
 
 
 function App(){
@@ -44,7 +46,7 @@ function App(){
     }
    />
    <Route
- path="/user-dashboard"
+ path="/user"
  element={
   <ProtectedRoute>
    <UserDashboard/>
@@ -72,8 +74,8 @@ function App(){
    {/* <Route path="*" element={<h1>404 Not Found</h1>} /> */}  
    <Route path="/navbar" element={<Navbar />} />
    <Route path="/layout" element={<Layout />} />
-
-
+<Route path="/register" element={<Register />} /> 
+<Route path="/admin" element={<AdminDashboard />} />  
   </Routes>
 
  )
@@ -82,3 +84,4 @@ function App(){
 
 
 export default App
+

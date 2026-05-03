@@ -1,9 +1,15 @@
 import express from "express";
-import { createVisitor, getVisitors } from "../controllers/visitorController.js";
+
+import {
+  getVisitors,
+  createVisitor,
+  deleteVisitor,
+} from "../controllers/visitorController.js";
 
 const router = express.Router();
 
-router.post("/", createVisitor);
 router.get("/", getVisitors);
+router.post("/", createVisitor);
+router.delete("/:id", deleteVisitor);
 
 export default router;

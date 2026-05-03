@@ -1,348 +1,481 @@
 
 
-// import { useEffect, useState } from "react"
-// import API from "../api/axios"
+// import { useEffect, useState } from "react";
+// import axios from "../utils/axios";
+// import "../styles/Users.css";
 
-// function Users(){
+// function Users() {
+//   const [users, setUsers] = useState([]);
 
-//  const [users,setUsers] = useState([])
-//  const [name,setName] = useState("")
-//  const [email,setEmail] = useState("")
+//   const [form, setForm] = useState({
+//     name: "",
+//     email: "",
+//     password: "",
+//     role: "USER",
+//   });
 
-//  const fetchUsers = async()=>{
-//   const res = await API.get("/users")
-//   setUsers(res.data.users)
-//  }
+//   const [loading, setLoading] = useState(false);
 
-//  useEffect(()=>{
-//   fetchUsers()
-//  },[])
+//   // ===============================
+//   // GET USERS
+//   // ===============================
+//   const fetchUsers = async () => {
+//     try {
+//       const res = await axios.get("/users");
+//       setUsers(res.data.users || res.data);
+//     } catch (error) {
+//       console.log("Fetch Users Error:", error);
+//     }
+//   };
 
-//  const createUser = async()=>{
+//   useEffect(() => {
+//     fetchUsers();
+//   }, []);
 
-//   await API.post("/users",{
-//    name,
-//    email
-//   })
+//   // ===============================
+//   // CREATE USER
+//   // ===============================
+//   const handleCreate = async (e) => {
+//     e.preventDefault();
 
-//   setName("")
-//   setEmail("")
+//     try {
+//       setLoading(true);
 
-//   fetchUsers()
-//  }
+//       await axios.post("/users", form);
 
-//  const deleteUser = async(id)=>{
+//       setForm({
+//         name: "",
+//         email: "",
+//         password: "",
+//         role: "USER",
+//       });
 
-//   await API.delete(`/users/${id}`)
-//   fetchUsers()
+//       fetchUsers();
+//     } catch (error) {
+//       console.log("Create User Error:", error);
+//       alert("User create failed");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-//  }
+//   // ===============================
+//   // DELETE USER
+//   // ===============================
+//   const handleDelete = async (id) => {
+//     try {
+//       await axios.delete(`/users/${id}`);
+//       fetchUsers();
+//     } catch (error) {
+//       console.log("Delete Error:", error);
+//     }
+//   };
 
-//  return(
+//   return (
+//     <div className="p-6">
 
-//   <div style={{padding:"20px"}}>
+//       {/* Title */}
+//       <h1 className="text-3xl font-bold mb-6">Users Management</h1>
 
-//    <h2>Users</h2>
+//       {/* Form */}
+//       <form
+//         onSubmit={handleCreate}
+//         className="bg-white shadow rounded-xl p-5 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4"
+//       >
+//         <input
+//           type="text"
+//           placeholder="Name"
+//           className="border p-3 rounded-lg"
+//           value={form.name}
+//           onChange={(e) =>
+//             setForm({ ...form, name: e.target.value })
+//           }
+//           required
+//         />
 
-//    <div style={{display:"flex",gap:"10px",marginBottom:"20px"}}>
+//         <input
+//           type="email"
+//           placeholder="Email"
+//           className="border p-3 rounded-lg"
+//           value={form.email}
+//           onChange={(e) =>
+//             setForm({ ...form, email: e.target.value })
+//           }
+//           required
+//         />
 
-//     <input
-//      placeholder="Name"
-//      value={name}
-//      onChange={(e)=>setName(e.target.value)}
-//     />
+//         <input
+//           type="password"
+//           placeholder="Password"
+//           className="border p-3 rounded-lg"
+//           value={form.password}
+//           onChange={(e) =>
+//             setForm({ ...form, password: e.target.value })
+//           }
+//           required
+//         />
 
-//     <input
-//      placeholder="Email"
-//      value={email}
-//      onChange={(e)=>setEmail(e.target.value)}
-//     />
+//         <select
+//           className="border p-3 rounded-lg"
+//           value={form.role}
+//           onChange={(e) =>
+//             setForm({ ...form, role: e.target.value })
+//           }
+//         >
+//           <option value="USER">USER</option>
+//           <option value="ADMIN">ADMIN</option>
+//         </select>
 
-//     <button onClick={createUser}>
-//      Create
-//     </button>
-
-//    </div>
-
-//    <table border="1" width="100%">
-
-//     <thead>
-
-//      <tr>
-//       <th>Name</th>
-//       <th>Email</th>
-//       <th>Action</th>
-//      </tr>
-
-//     </thead>
-
-//     <tbody>
-
-//      {users.map(u=>(
-
-//       <tr key={u.id}>
-
-//        <td>{u.name}</td>
-//        <td>{u.email}</td>
-
-//        <td>
-
-//         <button onClick={()=>deleteUser(u.id)}>
-//          Delete
+//         <button
+//           type="submit"
+//           className="bg-blue-600 text-white rounded-lg px-4 py-3 hover:bg-blue-700"
+//         >
+//           {loading ? "Creating..." : "Create"}
 //         </button>
+//       </form>
 
-//        </td>
+//       {/* Table */}
+//       <div className="bg-white shadow rounded-xl overflow-hidden">
+//         <table className="w-full">
 
-//       </tr>
+//           <thead className="bg-gray-100">
+//             <tr>
+//               <th className="p-4 text-left">Name</th>
+//               <th className="p-4 text-left">Email</th>
+//               <th className="p-4 text-left">Role</th>
+//               <th className="p-4 text-center">Action</th>
+//             </tr>
+//           </thead>
 
-//      ))}
+//           <tbody>
+//             {users.length > 0 ? (
+//               users.map((user) => (
+//                 <tr
+//                   key={user.id}
+//                   className="border-t hover:bg-gray-50"
+//                 >
+//                   <td className="p-4">{user.name}</td>
+//                   <td className="p-4">{user.email}</td>
+//                   <td className="p-4">{user.role}</td>
 
-//     </tbody>
+//                   <td className="p-4 text-center">
+//                     <button
+//                       onClick={() =>
+//                         handleDelete(user.id)
+//                       }
+//                       className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+//                     >
+//                       Delete
+//                     </button>
+//                   </td>
+//                 </tr>
+//               ))
+//             ) : (
+//               <tr>
+//                 <td
+//                   colSpan="4"
+//                   className="p-6 text-center text-gray-500"
+//                 >
+//                   No users found
+//                 </td>
+//               </tr>
+//             )}
+//           </tbody>
 
-//    </table>
-
-//   </div>
-
-//  )
-
+//         </table>
+//       </div>
+//     </div>
+//   );
 // }
 
-// export default Users
+// export default Users;
 
-import { useEffect, useState } from "react"
-import API from "../api/axios"
+import { useEffect, useState } from "react";
+import axios from "../utils/axios";
 
-function Users(){
+function Users() {
+  const [users, setUsers] = useState([]);
 
- const [users,setUsers] = useState([])
- const [name,setName] = useState("")
- const [email,setEmail] = useState("")
- const [password,setPassword] = useState("")
- const [loading,setLoading] = useState(false)
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "USER",
+  });
 
- // Fetch Users
- const fetchUsers = async ()=>{
+  const [loading, setLoading] = useState(false);
 
-  try{
+  // ===============================
+  // GET USERS
+  // ===============================
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("/users");
+      setUsers(res.data.users || res.data);
+    } catch (error) {
+      console.log("Fetch Users Error:", error);
+    }
+  };
 
-   const res = await API.get("/users")
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-   setUsers(res.data.users)
+  // ===============================
+  // CREATE USER
+  // ===============================
+  const handleCreate = async (e) => {
+    e.preventDefault();
 
-  }catch(err){
-   console.error(err)
-  }
+    try {
+      setLoading(true);
 
- }
+      await axios.post("/users", form);
 
- useEffect(()=>{
-  fetchUsers()
- },[])
+      setForm({
+        name: "",
+        email: "",
+        password: "",
+        role: "USER",
+      });
 
- // Create User
- const createUser = async ()=>{
+      fetchUsers();
+    } catch (error) {
+      console.log("Create User Error:", error);
+      alert("User create failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if(!name || !email || !password){
-   alert("Please fill all fields")
-   return
-  }
+  // ===============================
+  // DELETE USER
+  // ===============================
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/users/${id}`);
+      fetchUsers();
+    } catch (error) {
+      console.log("Delete Error:", error);
+    }
+  };
 
-  try{
-
-   setLoading(true)
-
-   await API.post("/users",{
-    name,
-    email,
-    password,
-    role:"USER"
-   })
-
-   setName("")
-   setEmail("")
-   setPassword("")
-
-   fetchUsers()
-
-  }catch(err){
-   console.error(err)
-  }finally{
-   setLoading(false)
-  }
-
- }
-
- // Delete User
- const deleteUser = async(id)=>{
-
-  try{
-
-   await API.delete(`/users/${id}`)
-
-   fetchUsers()
-
-  }catch(err){
-   console.error(err)
-  }
-
- }
-
- return(
-
-  <div style={{padding:"20px"}}>
-
-   <h2 style={{marginBottom:"20px"}}>
-    Users
-   </h2>
-
-   {/* Form */}
-
-   <div style={{
-    border:"1px solid #ccc",
-    padding:"15px",
-    borderRadius:"6px",
-    marginBottom:"20px",
-    display:"flex",
-    gap:"10px"
-   }}>
-
-    <input
-     placeholder="Name"
-     value={name}
-     onChange={(e)=>setName(e.target.value)}
-     style={{
-      padding:"8px",
-      border:"1px solid #ccc",
-      borderRadius:"4px"
-     }}
-    />
-
-    <input
-     placeholder="Email"
-     value={email}
-     onChange={(e)=>setEmail(e.target.value)}
-     style={{
-      padding:"8px",
-      border:"1px solid #ccc",
-      borderRadius:"4px"
-     }}
-    />
-
-    <input
-     type="password"
-     placeholder="Password"
-     value={password}
-     onChange={(e)=>setPassword(e.target.value)}
-     style={{
-      padding:"8px",
-      border:"1px solid #ccc",
-      borderRadius:"4px"
-     }}
-    />
-
-    <button
-     onClick={createUser}
-     disabled={loading}
-     style={{
-      background:"#2563eb",
-      color:"white",
-      border:"none",
-      padding:"8px 15px",
-      borderRadius:"4px",
-      cursor:"pointer"
-     }}
+  return (
+    <div
+      style={{
+        padding: "30px",
+        background: "#f5f7fb",
+        minHeight: "100vh",
+      }}
     >
-     {loading ? "Creating..." : "Create"}
-    </button>
+      {/* Title */}
+      <h1
+        style={{
+          fontSize: "32px",
+          fontWeight: "700",
+          marginBottom: "25px",
+          color: "#1e293b",
+        }}
+      >
+        Users Management
+      </h1>
 
-   </div>
+      {/* Form */}
+      <form
+        onSubmit={handleCreate}
+        style={{
+          background: "#ffffff",
+          padding: "25px",
+          borderRadius: "14px",
+          boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+          gap: "15px",
+          marginBottom: "30px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) =>
+            setForm({ ...form, name: e.target.value })
+          }
+          required
+          style={inputStyle}
+        />
 
+        <input
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) =>
+            setForm({ ...form, email: e.target.value })
+          }
+          required
+          style={inputStyle}
+        />
 
-   {/* Users Table */}
+        <input
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={(e) =>
+            setForm({ ...form, password: e.target.value })
+          }
+          required
+          style={inputStyle}
+        />
 
-   <table style={{
-    width:"100%",
-    borderCollapse:"collapse"
-   }}>
+        <select
+          value={form.role}
+          onChange={(e) =>
+            setForm({ ...form, role: e.target.value })
+          }
+          style={inputStyle}
+        >
+          <option value="USER">USER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
 
-    <thead>
-
-     <tr style={{background:"#f3f4f6"}}>
-
-      <th style={{border:"1px solid #ccc",padding:"10px"}}>
-       Name
-      </th>
-
-      <th style={{border:"1px solid #ccc",padding:"10px"}}>
-       Email
-      </th>
-
-      <th style={{border:"1px solid #ccc",padding:"10px"}}>
-       Action
-      </th>
-
-     </tr>
-
-    </thead>
-
-    <tbody>
-
-     {users.length === 0 ? (
-
-      <tr>
-
-       <td colSpan="3" style={{padding:"15px",textAlign:"center"}}>
-        No users found
-       </td>
-
-      </tr>
-
-     ) : (
-
-      users.map(user=>(
-
-       <tr key={user.id}>
-
-        <td style={{border:"1px solid #ccc",padding:"10px"}}>
-         {user.name}
-        </td>
-
-        <td style={{border:"1px solid #ccc",padding:"10px"}}>
-         {user.email}
-        </td>
-
-        <td style={{border:"1px solid #ccc",padding:"10px"}}>
-
-         <button
-          onClick={()=>deleteUser(user.id)}
+        <button
+          type="submit"
           style={{
-           background:"#ef4444",
-           color:"white",
-           border:"none",
-           padding:"6px 10px",
-           borderRadius:"4px",
-           cursor:"pointer"
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            padding: "14px",
+            fontWeight: "600",
+            cursor: "pointer",
           }}
-         >
-          Delete
-         </button>
+        >
+          {loading ? "Creating..." : "Create User"}
+        </button>
+      </form>
 
-        </td>
+      {/* Table */}
+      <div
+        style={{
+          background: "#ffffff",
+          borderRadius: "14px",
+          overflow: "hidden",
+          boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
+        }}
+      >
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+          }}
+        >
+          <thead>
+            <tr
+              style={{
+                background: "#f1f5f9",
+                textAlign: "left",
+              }}
+            >
+              <th style={thStyle}>Name</th>
+              <th style={thStyle}>Email</th>
+              <th style={thStyle}>Role</th>
+              <th style={thStyle}>Action</th>
+            </tr>
+          </thead>
 
-       </tr>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user, index) => (
+                <tr
+                  key={user.id}
+                  style={{
+                    borderTop: "1px solid #e2e8f0",
+                    background:
+                      index % 2 === 0 ? "#ffffff" : "#f8fafc",
+                  }}
+                >
+                  <td style={tdStyle}>{user.name}</td>
+                  <td style={tdStyle}>{user.email}</td>
+                  <td style={tdStyle}>
+                    <span
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "20px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        background:
+                          user.role === "ADMIN"
+                            ? "#dcfce7"
+                            : "#dbeafe",
+                        color:
+                          user.role === "ADMIN"
+                            ? "#166534"
+                            : "#1d4ed8",
+                      }}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
 
-      ))
-
-     )}
-
-    </tbody>
-
-   </table>
-
-  </div>
-
- )
-
+                  <td style={tdStyle}>
+                    <button
+                      onClick={() =>
+                        handleDelete(user.id)
+                      }
+                      style={{
+                        background: "#ef4444",
+                        color: "white",
+                        border: "none",
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  style={{
+                    padding: "25px",
+                    textAlign: "center",
+                    color: "#64748b",
+                  }}
+                >
+                  No users found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
-export default Users
+// Reusable Styles
+const inputStyle = {
+  padding: "14px",
+  border: "1px solid #cbd5e1",
+  borderRadius: "10px",
+  fontSize: "15px",
+  outline: "none",
+};
+
+const thStyle = {
+  padding: "16px",
+  fontSize: "15px",
+  color: "#334155",
+};
+
+const tdStyle = {
+  padding: "16px",
+  color: "#1e293b",
+};
+
+export default Users;

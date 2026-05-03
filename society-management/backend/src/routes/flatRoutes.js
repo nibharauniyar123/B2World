@@ -1,27 +1,16 @@
 import express from "express";
 import {
-  createFlat,
   getFlats,
-  getFlatById,
-  updateFlat,
-  deleteFlat
+  createFlat,
+  deleteFlat,
+  updateFlat
 } from "../controllers/flatController.js";
 
 const router = express.Router();
 
-/* CREATE FLAT */
-router.post("/", createFlat);
-
-/* GET ALL FLATS */
 router.get("/", getFlats);
-
-/* GET SINGLE FLAT */
-router.get("/:id", getFlatById);
-
-/* UPDATE FLAT */
-router.put("/:id", updateFlat);
-
-/* DELETE FLAT */
+router.post("/", createFlat);   // ✅ IMPORTANT
+router.put("/:id", updateFlat); // ✅ IMPORTANT
 router.delete("/:id", deleteFlat);
 
 export default router;
