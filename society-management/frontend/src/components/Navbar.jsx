@@ -1,41 +1,17 @@
+import { FaUserCircle } from "react-icons/fa";
 
-import { useNavigate } from "react-router-dom";
-
-export default function Navbar() {
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-
-    // remove token
-    localStorage.removeItem("token");
-
-    // redirect to login
-    navigate("/");
-
-  };
-
+function Navbar({ user, onLogout }) {
   return (
+    <div className="navbar">
+      <h2>Society Management</h2>
 
-    <div className="flex justify-between items-center bg-white shadow p-4">
-
-      {/* Title */}
-
-      <h1 className="text-xl font-bold text-gray-700">
-        Society Admin Dashboard
-      </h1>
-
-      {/* Logout Button */}
-
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-      >
-        Logout
-      </button>
-
+      <div className="nav-right">
+        <FaUserCircle size={20} />
+        <span>{user?.name} ({user?.role})</span>
+        <button onClick={onLogout}>Logout</button>
+      </div>
     </div>
-
   );
-
 }
+
+export default Navbar;

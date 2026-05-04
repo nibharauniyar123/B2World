@@ -91,7 +91,7 @@ const navigate = useNavigate();
           
           </div>
 
-<div style={styles.topActions}>
+{/* <div style={styles.topActions}>
   {user?.role === "ADMIN" && (
     <div
       style={styles.badge}
@@ -107,6 +107,23 @@ const navigate = useNavigate();
   >
     User Panel
   </div>
+</div> */}
+<div style={styles.topActions}>
+  {user?.role === "ADMIN" && (
+    <button
+      style={styles.adminBtn}
+      onClick={() => navigate("/admin")}
+    >
+      Admin Panel
+    </button>
+  )}
+
+  <button
+    style={styles.userBtn}
+    onClick={() => navigate("/user")}
+  >
+    User Panel
+  </button>
 </div>
  
 </div>
@@ -168,24 +185,33 @@ const navigate = useNavigate();
           </div>
 
           {/* Summary */}
-          <div style={styles.box}>
-            <h3 style={styles.boxTitle}>Summary</h3>
+      
+          <div style={styles.summaryBox}>
+  <h3>Summary</h3>
 
-            <p>Total Users: {stats.users}</p>
-            <p>Pending Complaints: {stats.complaints}</p>
-            <p>Visitors Today: {stats.visitors}</p>
-            <p>Bookings: {stats.bookings}</p>
-              <div style={styles.chart}>
-      <ResponsiveContainer width="100%" height={250}>
-        <BarChart data={data}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-          </div>
+  <p>Total Users: 6</p>
+  <p>Pending Complaints: 4</p>
+  <p>Visitors Today: 2</p>
+  <p>Bookings: 3</p>
+
+  <div style={{ marginTop: "20px" }}>
+    <ResponsiveContainer width="100%" height={250}>
+      <BarChart
+        data={[
+          { name: "Users", value: 6 },
+          { name: "Societies", value: 3 },
+          { name: "Complaints", value: 4 },
+          { name: "Bookings", value: 3 },
+        ]}
+      >
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="value" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
         </div>
       </div>
     </Layout>
@@ -322,4 +348,41 @@ userBadge: {
   marginTop: "20px",
   width: "100%",
 },
+
+  quickBox: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    width: "100%",
+  },
+
+  summaryBox: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    width: "100%",
+  },
+  adminBtn: {
+  background: "#0f172a",
+  color: "#fff",
+  border: "none",
+  padding: "10px 18px",
+  borderRadius: "20px",
+  cursor: "pointer",
+},
+
+userBtn: {
+  background: "#16a34a",
+  color: "#fff",
+  border: "none",
+  padding: "10px 18px",
+  borderRadius: "20px",
+  cursor: "pointer",
+},
+
 };
+
+
+
+
+

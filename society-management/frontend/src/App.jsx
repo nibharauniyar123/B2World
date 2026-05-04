@@ -18,6 +18,8 @@ import Visitors from "./pages/Visitors";
 import Maintenance from "./pages/Maintenance";
 import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
+import Card from "./components/Card";
+import Chart from "./components/Chart";
 
 
 function App(){
@@ -75,7 +77,9 @@ function App(){
    <Route path="/navbar" element={<Navbar />} />
    <Route path="/layout" element={<Layout />} />
 <Route path="/register" element={<Register />} /> 
-<Route path="/admin" element={<AdminDashboard />} />  
+<Route path="/admin" element={<AdminDashboard />} /> 
+<Route path="/card" element={<Card title="Test Card" value="123" color="#4ade80" />} />  
+<Route path="/chart" element={<Chart />} />  
   </Routes>
 
  )
