@@ -14,6 +14,7 @@ import bookingRoutes from "./src/routes/bookingRoutes.js";
 import maintenanceRoutes from "./src/routes/maintenanceRoutes.js";
 import noticeRoutes from "./src/routes/noticeRoutes.js";  
 import visitorRoutes from "./src/routes/visitorRoutes.js";
+import notificationRoutes from "./src/routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -34,7 +35,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
 app.use("/api/visitors", visitorRoutes);
-
+app.use("/api/notifications", notificationRoutes);
 
 app.get("/api", (_req, res) => {
   res.send("Society Management API Running");

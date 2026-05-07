@@ -23,6 +23,10 @@ function Sidebar({ collapsed, setCollapsed }) {
     { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
     { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
     { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
+    {
+  name: "Notifications",
+  path: "/notifications",
+}
   ];
 
   return (

@@ -20,6 +20,7 @@ import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import Card from "./components/Card";
 import Chart from "./components/Chart";
+import Notifications from "./pages/Notifications";
 
 
 function App(){
@@ -80,6 +81,7 @@ function App(){
 <Route path="/admin" element={<AdminDashboard />} /> 
 <Route path="/card" element={<Card title="Test Card" value="123" color="#4ade80" />} />  
 <Route path="/chart" element={<Chart />} />  
+<Route path="/notifications" element={<Notifications />} />
   </Routes>
 
  )
