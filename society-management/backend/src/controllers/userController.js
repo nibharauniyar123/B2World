@@ -1,8 +1,11 @@
-import prisma from "../config/prisma.js";
+import prisma from "../prisma/prismaClient.js";
 import bcrypt from "bcryptjs";
 
 export const createUser = async (req, res) => {
   try {
+
+    console.log("BODY:", req.body);
+
     const { name, email, password, role } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -12,27 +15,30 @@ export const createUser = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        // societyId: 1,
-        role: role || "USER",   // ✅ FIXED
+        role,
       },
     });
+
+    console.log("USER CREATED:", user);
 
     res.status(201).json(user);
 
   } catch (error) {
+
+    console.log("CREATE USER ERROR:");
     console.log(error);
-    res.status(500).json({ error: error.message });
+
+    res.status(500).json({
+      message: "Create failed",
+      error: error.message,
+    });
   }
 };
 export const getUsers = async (req, res) => {
   try {
 
     const users = await prisma.user.findMany()
-    //   where:
-    //     societyId:1
-    //   }
-    // })
-
+  
     res.json(users)
 
   } catch (error) {
@@ -40,20 +46,7 @@ export const getUsers = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
-// DELETE USER
-// export const deleteUser = async (req, res) => {
-//   try {
-//     const id = req.params.id;
 
-//     await prisma.user.delete({
-//       where: { id },
-//     });
-
-//     res.json({ message: "User removed" });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 export const deleteUser = async (req, res) => {
   try {
     const id = parseInt(req.params.id);

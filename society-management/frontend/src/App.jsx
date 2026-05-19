@@ -21,6 +21,10 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Card from "./components/Card";
 import Chart from "./components/Chart";
 import Notifications from "./pages/Notifications";
+import Reports from "./pages/Reports";
+import Upload from "./pages/Upload"; 
+import Invoices from "./pages/Invoices";
+import Payments from "./pages/Payments" 
 
 
 function App(){
@@ -82,6 +86,10 @@ function App(){
 <Route path="/card" element={<Card title="Test Card" value="123" color="#4ade80" />} />  
 <Route path="/chart" element={<Chart />} />  
 <Route path="/notifications" element={<Notifications />} />
+<Route path="/reports" element={<Reports />} /> 
+<Route path="/upload" element={<Upload />} /> 
+<Route path="/invoices" element={<Invoices />} />
+<Route path="/payments" element={<Payments />} />
   </Routes>
 
  )

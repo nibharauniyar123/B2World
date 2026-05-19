@@ -18,8 +18,9 @@ model User {
   societyId  Int? //optional 
   society    Society?    @relation(fields: [societyId], references: [id])
   complaints Complaint[]
-
+  payments Payment[]
   createdAt DateTime @default(now())
+  profileImage String?
 }
 
 model Society {
@@ -101,4 +102,17 @@ model Notification {
   title     String
   message   String
   createdAt DateTime @default(now())
+}
+model Payment {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  amount             Float
+  waterCharge        Float
+  electricityCharge  Float
+  lateFee            Float
+  totalAmount        Float
+  status             String   @default("PENDING")
+  createdAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

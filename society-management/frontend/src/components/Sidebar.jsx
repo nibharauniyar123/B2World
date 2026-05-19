@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom";
+import { FaUpload } from "react-icons/fa";
+import { FaMoneyBill } from "react-icons/fa";
+
 import {
   FaTachometerAlt,
   FaUsers,
@@ -23,10 +26,10 @@ function Sidebar({ collapsed, setCollapsed }) {
     { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
     { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
     { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
-    {
-  name: "Notifications",
-  path: "/notifications",
-}
+    { name: "Upload", icon: <FaUpload />, path: "/upload" },
+    { name: "Notifications", icon: <FaMoneyBill />, path: "/notifications" },
+    { name: "Payments", icon: <FaMoneyBill />, path: "/payments" }   , 
+ { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
   ];
 
   return (

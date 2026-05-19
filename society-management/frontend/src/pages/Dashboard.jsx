@@ -32,7 +32,7 @@ const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   // ========================
-  // FETCH DATA
+  // FETCH DATA 
   // ========================
   const fetchStats = async () => {
     try {
@@ -90,24 +90,6 @@ const navigate = useNavigate();
             <p style={styles.sub}>Society Management Overview</p>
           
           </div>
-
-{/* <div style={styles.topActions}>
-  {user?.role === "ADMIN" && (
-    <div
-      style={styles.badge}
-      onClick={() => navigate("/admin")}
-    >
-      Admin Panel
-    </div>
-  )}
-
-  <div
-    style={styles.userBadge}
-    onClick={() => navigate("/user")}
-  >
-    User Panel
-  </div>
-</div> */}
 <div style={styles.topActions}>
   {user?.role === "ADMIN" && (
     <button
@@ -156,7 +138,6 @@ const navigate = useNavigate();
           </div>
         )}
 
-        {/* BOTTOM SECTION */}
         <div style={styles.bottomGrid}>
           {/* Quick Actions */}
           <div style={styles.box}>
@@ -168,6 +149,7 @@ const navigate = useNavigate();
             >
               ➕ Add User
             </button>
+          
 
             <button
               style={styles.actionBtn}
@@ -182,10 +164,14 @@ const navigate = useNavigate();
             >
               ➕ Add Booking
             </button>
-          </div>
+            <button
+  onClick={() => navigate("/reports")}
+>
+  View Reports
+</button>
 
-          {/* Summary */}
-      
+          </div>
+     
           <div style={styles.summaryBox}>
   <h3>Summary</h3>
 
