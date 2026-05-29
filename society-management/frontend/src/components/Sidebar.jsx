@@ -16,21 +16,55 @@ import {
 
 function Sidebar({ collapsed, setCollapsed }) {
   const navigate = useNavigate();
+    const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
-  const menu = [
-    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
-    { name: "Users", icon: <FaUsers />, path: "/users" },
-    { name: "Societies", icon: <FaBuilding />, path: "/societies" },
-    { name: "Flats", icon: <FaHome />, path: "/flats" },
-    { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
-    { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
-    { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
-    { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
-    { name: "Upload", icon: <FaUpload />, path: "/upload" },
-    { name: "Notifications", icon: <FaMoneyBill />, path: "/notifications" },
-    { name: "Payments", icon: <FaMoneyBill />, path: "/payments" }   , 
- { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
-  ];
+//   const menu = [
+//     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
+//     { name: "Users", icon: <FaUsers />, path: "/users" },
+//     { name: "Societies", icon: <FaBuilding />, path: "/societies" },
+//     { name: "Flats", icon: <FaHome />, path: "/flats" },
+//     { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
+//     { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
+//     { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
+//     { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
+//     { name: "Upload", icon: <FaUpload />, path: "/upload" },
+//     { name: "Notifications", icon: <FaMoneyBill />, path: "/notifications" },
+//     { name: "Payments", icon: <FaMoneyBill />, path: "/payments" }   , 
+//  { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
+//  {name: "Expenses", path: "/expenses", icon: <FaMoneyBill />},
+// {name: "Vendors",path: "/vendors", icon: <FaMoneyBill />},
+
+// { name: "Reports", path: "/reports", icon: <FaMoneyBill />}, 
+//   ];
+const adminMenu = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin" },
+  { name: "Users", icon: <FaUsers />, path: "/users" },
+  { name: "Societies", icon: <FaBuilding />, path: "/societies" },
+  { name: "Flats", icon: <FaHome />, path: "/flats" },
+  { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
+  { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
+  { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
+  { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
+  { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
+  { name: "Expenses", icon: <FaMoneyBill />, path: "/expenses" },
+  { name: "Vendors", icon: <FaMoneyBill />, path: "/vendors" },
+  { name: "Reports", icon: <FaMoneyBill />, path: "/reports" },
+];
+
+const userMenu = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/user" },
+  { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
+  { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
+  { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
+  { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
+];
+const menu =
+    user?.role === "ADMIN" ||
+    user?.role === "SUPER_ADMIN"
+      ? adminMenu
+      : userMenu;
 
   return (
     <div

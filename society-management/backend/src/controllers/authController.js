@@ -3,82 +3,134 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // REGISTER
-export const registerUser = async (req, res) => {
+export const register = async (req, res) => {
+
   try {
-    const { name, email, password, role } = req.body;
+
+    const {
+      name,
+      email,
+      password,
+    } = req.body;
+
+    console.log(req.body);
 
     // check existing user
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser =
+      await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
 
     if (existingUser) {
+
       return res.status(400).json({
-        message: "Email already exists",
+        message: "User already exists",
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // hash password
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: role || "USER",
-      },
-    });
+    // create user
+    const user =
+      await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
 
-    res.json({
-      message: "User registered",
+          // IMPORTANT
+          role: "RESIDENT",
+        },
+      });
+
+    res.status(201).json({
+      success: true,
       user,
     });
+
   } catch (error) {
+
+    console.log(
+      "REGISTER ERROR:"
+    );
+
+    console.log(error);
+
     res.status(500).json({
+      success: false,
       error: error.message,
     });
   }
 };
 
 // LOGIN
-export const loginUser = async (req, res) => {
+export const login = async (req, res) => {
+
   try {
+
     const { email, password } = req.body;
 
+    console.log(email, password);
+
+    // find user
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: {
+        email,
+      },
     });
 
+    console.log(user);
+
+    // no user
     if (!user) {
       return res.status(404).json({
         message: "User not found",
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // compare password
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    console.log(isMatch);
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Invalid password",
+        message: "Invalid Password",
       });
     }
 
+    // create token
     const token = jwt.sign(
       {
         id: user.id,
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      {
+        expiresIn: "7d",
+      }
     );
 
-    res.json({
-      message: "Login success",
+    res.status(200).json({
+      success: true,
       token,
       user,
     });
+
   } catch (error) {
+
+    console.log("LOGIN ERROR:");
+    console.log(error);
+
     res.status(500).json({
+      success: false,
       error: error.message,
     });
   }

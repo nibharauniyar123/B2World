@@ -20,6 +20,8 @@ import reportRoutes from "./src/routes/reportRoutes.js";
 import uploadRoutes from "./src/routes/uploadRoutes.js";
 import invoiceRoutes from "./src/routes/invoiceRoutes.js";
 import paymentRoutes from "./src/routes/paymentRoutes.js";
+import vendorRoutes from "./src/routes/vendorRoutes.js";
+import expenseRoutes from "./src/routes/expenseRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -45,6 +47,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/vendors", vendorRoutes);
+app.use("/api/expenses", expenseRoutes);
 app.get("/api", (_req, res) => {
   res.send("Society Management API Running");
 });

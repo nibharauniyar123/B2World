@@ -25,7 +25,9 @@ import Reports from "./pages/Reports";
 import Upload from "./pages/Upload"; 
 import Invoices from "./pages/Invoices";
 import Payments from "./pages/Payments" 
-
+import Expenses from "./pages/Expenses";
+import Vendors from "./pages/Vendors";
+import Profile from "./pages/Profile";
 
 function App(){
 
@@ -60,6 +62,14 @@ function App(){
   </ProtectedRoute>
  }
 />
+<Route
+ path="/profile"
+ element={
+  <ProtectedRoute>
+   <Profile />
+  </ProtectedRoute>
+ }
+/>
 
    <Route
     path="/societies"
@@ -82,7 +92,14 @@ function App(){
    <Route path="/navbar" element={<Navbar />} />
    <Route path="/layout" element={<Layout />} />
 <Route path="/register" element={<Register />} /> 
-<Route path="/admin" element={<AdminDashboard />} /> 
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute>
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+/>
 <Route path="/card" element={<Card title="Test Card" value="123" color="#4ade80" />} />  
 <Route path="/chart" element={<Chart />} />  
 <Route path="/notifications" element={<Notifications />} />
@@ -90,6 +107,8 @@ function App(){
 <Route path="/upload" element={<Upload />} /> 
 <Route path="/invoices" element={<Invoices />} />
 <Route path="/payments" element={<Payments />} />
+<Route path="/expenses" element={<Expenses />} />
+<Route path="/vendors" element={<Vendors />} />
   </Routes>
 
  )

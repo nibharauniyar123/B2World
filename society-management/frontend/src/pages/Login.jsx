@@ -18,7 +18,17 @@ function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      nav("/dashboard");
+      // nav("/dashboard");
+      const user = res.data.user;
+
+if (
+  user.role === "ADMIN" ||
+  user.role === "SUPER_ADMIN"
+) {
+  nav("/admin");
+} else {
+  nav("/user");
+}
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     } finally {

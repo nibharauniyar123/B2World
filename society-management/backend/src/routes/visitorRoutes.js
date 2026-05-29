@@ -1,15 +1,16 @@
 import express from "express";
 
 import {
-  getVisitors,
   createVisitor,
-  deleteVisitor,
+  getVisitors,
+  updateVisitorStatus,
 } from "../controllers/visitorController.js";
 
 const router = express.Router();
 
-router.get("/", getVisitors);
 router.post("/", createVisitor);
-router.delete("/:id", deleteVisitor);
+
+router.get("/", getVisitors);
+router.put("/:id", updateVisitorStatus);
 
 export default router;

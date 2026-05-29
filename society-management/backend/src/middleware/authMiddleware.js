@@ -1,95 +1,99 @@
 import jwt from "jsonwebtoken";
+import prisma from "../prisma/prismaClient.js";
 
-// ==============================
-// 🔐 PROTECT ROUTE (VERIFY TOKEN)
-// ==============================
-export const protect = (req, res, next) => {
+
+// PROTECT ROUTE
+export const protect = async (
+  req,
+  res,
+  next
+) => {
+
   try {
+
     let token;
 
-    // Check Authorization header
+    // get token
     if (
       req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
+      req.headers.authorization.startsWith(
+        "Bearer"
+      )
     ) {
-      token = req.headers.authorization.split(" ")[1];
+
+      token =
+        req.headers.authorization.split(
+          " "
+        )[1];
     }
 
-    // If no token
+    // no token
     if (!token) {
+
       return res.status(401).json({
-        success: false,
         message: "No token provided",
       });
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // verify token
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
 
-    // Attach user data to request
-    req.user = decoded;
+    // find user
+    const user =
+      await prisma.user.findUnique({
+        where: {
+          id: decoded.id,
+        },
+      });
+
+    if (!user) {
+
+      return res.status(401).json({
+        message: "User not found",
+      });
+    }
+
+    req.user = user;
 
     next();
+
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token",
+
+    console.log(error);
+
+    res.status(401).json({
+      message: "Unauthorized",
     });
   }
 };
 
-// ==============================
-// 👑 ADMIN ONLY ACCESS
-// ==============================
-export const isAdmin = (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({
-        success: false,
-        message: "Admin access required",
-      });
-    }
 
-    next();
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Role check failed",
-    });
-  }
-};
 
-// ==============================
-// 👤 USER OR ADMIN ACCESS
-// ==============================
-export const isUserOrAdmin = (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
+// ADMIN CHECK
+export const isAdmin = (
+  req,
+  res,
+  next
+) => {
 
-    if (req.user.role === "USER" || req.user.role === "ADMIN") {
-      return next();
-    }
+  if (
+    req.user.role !== "RESIDENT"
+  ) {
 
     return res.status(403).json({
-      success: false,
-      message: "Access denied",
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Access check failed",
+      message: "Admin only access",
     });
   }
+
+  next();
 };
+
+
+
+
+// DEFAULT EXPORT
+export default protect;
