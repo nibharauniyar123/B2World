@@ -1,122 +1,83 @@
-import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+import prisma from "../config/prisma.js";
 
-// GET ALL
-export const getMaintenance =
-  async (req, res) => {
-    try {
-      const data =
-        await prisma.maintenance.findMany({
-          orderBy: {
-            id: "desc",
-          },
-        });
+export const createMaintenance = async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
 
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({
-        error:
-          error.message,
-      });
-    }
-  };
+   const { userId, amount, month, dueDate } = req.body;
 
-// CREATE
-export const createMaintenance =
-  async (req, res) => {
-    try {
-      const {
-        amount,
+const amountNum = Number(amount);
+    const today = new Date();
+
+    let lateFee = 0;
+
+    if (today > new Date(dueDate)) {
+  lateFee = amountNum * 0.05;
+}
+
+const gst = amountNum * 0.13;
+
+const total = amountNum + gst + lateFee;
+
+    const bill = await prisma.maintenance.create({
+      data: {
+        userId: Number(userId),
+        amount: amountNum,
         month,
-        userId,
-      } = req.body;
+        dueDate: new Date(dueDate),
+        gst,
+        lateFee,
+        total,
+        status: "PENDING",
+      },
+    });
 
-      const data =
-        await prisma.maintenance.create({
-          data: {
-            amount:
-              parseFloat(
-                amount
-              ),
-            month,
-            userId:
-              parseInt(
-                userId
-              ),
-            status:
-              "PENDING",
-          },
-        });
+    res.status(201).json(bill);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to create maintenance bill",
+    });
+  }
+};
 
-      res.status(201).json(
-        data
-      );
-    } catch (error) {
-      res.status(500).json({
-        error:
-          error.message,
-      });
-    }
-  };
+export const getMaintenanceBills = async (req, res) => {
+  try {
+    const bills = await prisma.maintenance.findMany({
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-// DELETE
-export const deleteMaintenance =
-  async (req, res) => {
-    try {
-      const id =
-        parseInt(
-          req.params.id
-        );
+    res.json(bills);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to fetch bills",
+    });
+  }
+};
 
-      await prisma.maintenance.delete({
-        where: {
-          id,
-        },
-      });
+export const markPaid = async (req, res) => {
+  try {
+    const bill = await prisma.maintenance.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        status: "PAID",
+      },
+    });
 
-      res.json({
-        message:
-          "Deleted",
-      });
-    } catch (error) {
-      res.status(500).json({
-        error:
-          error.message,
-      });
-    }
-  };
-
-// UPDATE STATUS
-export const updateMaintenance =
-  async (req, res) => {
-    try {
-      const id =
-        parseInt(
-          req.params.id
-        );
-
-      const {
-        status,
-      } = req.body;
-
-      const updated =
-        await prisma.maintenance.update({
-          where: {
-            id,
-          },
-          data: {
-            status,
-          },
-        });
-
-      res.json(
-        updated
-      );
-    } catch (error) {
-      res.status(500).json({
-        error:
-          error.message,
-      });
-    }
-  };
+    res.json(bill);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to update bill",
+    });
+  }
+};

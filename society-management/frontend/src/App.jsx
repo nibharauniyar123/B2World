@@ -28,6 +28,11 @@ import Payments from "./pages/Payments"
 import Expenses from "./pages/Expenses";
 import Vendors from "./pages/Vendors";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings"
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import GuardDashboard from "./pages/GuardDashboard";
+import AccountantDashboard from "./pages/AccountantDashboard";
+
 
 function App(){
 
@@ -45,7 +50,23 @@ function App(){
   </ProtectedRoute>
     }
    />
+<Route path="/super-admin" element={
+<ProtectedRoute>
+<SuperAdminDashboard />
+</ProtectedRoute>
+} />
 
+<Route path="/guard" element={
+<ProtectedRoute>
+<GuardDashboard />
+</ProtectedRoute>
+} />
+
+<Route path="/accountant" element={
+<ProtectedRoute>
+<AccountantDashboard />
+</ProtectedRoute>
+} />
    <Route
     path="/users"
     element={
@@ -70,7 +91,14 @@ function App(){
   </ProtectedRoute>
  }
 />
-
+<Route
+ path="/settings"
+ element={
+  <ProtectedRoute>
+   <Settings />
+  </ProtectedRoute>
+ }
+/>
    <Route
     path="/societies"
     element={

@@ -1,25 +1,57 @@
-import prisma from "../prisma/prismaClient.js";
+import prisma from "../config/prisma.js";
 
 export const getReports = async (req, res) => {
   try {
-    const users = await prisma.user.count();
 
-    const complaints = await prisma.complaint.count();
+    const payments = await prisma.payment.findMany();
 
-    const bookings = await prisma.booking.count();
+    const complaints = await prisma.complaint.findMany();
 
-    const maintenance = await prisma.maintenance.count();
+    const visitors = await prisma.visitor.findMany();
 
-    res.json({
-      users,
-      complaints,
-      bookings,
-      maintenance,
-    });
+    const expenses = await prisma.expense.findMany();
+
+    const totalRevenue = payments.reduce(
+      (sum, p) => sum + p.totalAmount,
+      0
+    );
+
+    const totalExpense = expenses.reduce(
+      (sum, e) => sum + e.amount,
+      0
+    );
+    const openComplaints = complaints.filter(
+  (c) => c.status === "OPEN"
+).length;
+
+const progressComplaints = complaints.filter(
+  (c) => c.status === "IN_PROGRESS"
+).length;
+
+const resolvedComplaints = complaints.filter(
+  (c) => c.status === "RESOLVED"
+).length;
+
+res.json({
+  payments,
+  complaints,
+  visitors,
+  expenses,
+  totalRevenue,
+  totalExpense,
+
+  complaintStats: {
+    open: openComplaints,
+    progress: progressComplaints,
+    resolved: resolvedComplaints,
+  },
+});
 
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      error: error.message,
+      message: "Failed",
     });
   }
 };

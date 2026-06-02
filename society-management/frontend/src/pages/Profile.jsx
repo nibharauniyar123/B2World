@@ -1,24 +1,45 @@
-import { useEffect, useState } from "react";
+import React from "react";
 
 function Profile() {
-  const [user, setUser] = useState({});
-
-  useEffect(() => {
-    const data =
-      JSON.parse(
-        localStorage.getItem("user")
-      );
-
-    setUser(data);
-  }, []);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
-    <div>
+    <div style={{ padding: "30px" }}>
       <h1>My Profile</h1>
 
-      <h3>{user.name}</h3>
-      <p>{user.email}</p>
-      <p>{user.role}</p>
+      <div
+        style={{
+          background: "#fff",
+          padding: "20px",
+          borderRadius: "10px",
+          maxWidth: "500px",
+          marginTop: "20px",
+        }}
+      >
+        <img
+          src={
+            user?.photo ||
+            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          }
+          alt="profile"
+          width="120"
+        />
+
+        <h3>{user?.name}</h3>
+
+        <p>
+          <strong>Email:</strong> {user?.email}
+        </p>
+
+        <p>
+          <strong>Role:</strong> {user?.role}
+        </p>
+
+        <p>
+          <strong>Society:</strong>{" "}
+          {user?.society?.name || "Not Assigned"}
+        </p>
+      </div>
     </div>
   );
 }

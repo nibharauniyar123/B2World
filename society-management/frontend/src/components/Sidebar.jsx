@@ -5,6 +5,8 @@ import { FaMoneyBill } from "react-icons/fa";
 import {
   FaTachometerAlt,
   FaUsers,
+  FaUser,
+  FaCog,
   FaBuilding,
   FaHome,
   FaUserFriends,
@@ -12,6 +14,7 @@ import {
   FaTools,
   FaCalendarCheck,
   FaBars,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 function Sidebar({ collapsed, setCollapsed }) {
@@ -19,52 +22,116 @@ function Sidebar({ collapsed, setCollapsed }) {
     const user = JSON.parse(
     localStorage.getItem("user")
   );
-
-//   const menu = [
-//     { name: "Dashboard", icon: <FaTachometerAlt />, path: "/dashboard" },
-//     { name: "Users", icon: <FaUsers />, path: "/users" },
-//     { name: "Societies", icon: <FaBuilding />, path: "/societies" },
-//     { name: "Flats", icon: <FaHome />, path: "/flats" },
-//     { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
-//     { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
-//     { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
-//     { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
-//     { name: "Upload", icon: <FaUpload />, path: "/upload" },
-//     { name: "Notifications", icon: <FaMoneyBill />, path: "/notifications" },
-//     { name: "Payments", icon: <FaMoneyBill />, path: "/payments" }   , 
-//  { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
-//  {name: "Expenses", path: "/expenses", icon: <FaMoneyBill />},
-// {name: "Vendors",path: "/vendors", icon: <FaMoneyBill />},
-
-// { name: "Reports", path: "/reports", icon: <FaMoneyBill />}, 
-//   ];
-const adminMenu = [
-  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin" },
-  { name: "Users", icon: <FaUsers />, path: "/users" },
+// const adminMenu = [
+//   { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin" },
+//   { name: "Users", icon: <FaUsers />, path: "/users" },
+//   { name: "Societies", icon: <FaBuilding />, path: "/societies" },
+//   { name: "Flats", icon: <FaHome />, path: "/flats" },
+//   { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
+//   { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
+//   { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
+//   { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
+//   { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
+//   { name: "Expenses", icon: <FaMoneyBill />, path: "/expenses" },
+//   { name: "Vendors", icon: <FaMoneyBill />, path: "/vendors" },
+//   { name: "Reports", icon: <FaMoneyBill />, path: "/reports" },
+// ];
+const superAdminMenu = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/super-admin" },
   { name: "Societies", icon: <FaBuilding />, path: "/societies" },
-  { name: "Flats", icon: <FaHome />, path: "/flats" },
-  { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
-  { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
-  { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
-  { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
-  { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
-  { name: "Expenses", icon: <FaMoneyBill />, path: "/expenses" },
-  { name: "Vendors", icon: <FaMoneyBill />, path: "/vendors" },
-  { name: "Reports", icon: <FaMoneyBill />, path: "/reports" },
+  { name: "Subscriptions", icon: <FaMoneyBill />, path: "/subscriptions" },
+  { name: "Activity Logs", icon: <FaMoneyBill />, path: "/activity-logs" },
 ];
 
-const userMenu = [
+const guardMenu = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/guard" },
+  { name: "Visitors", icon: <FaUserFriends />, path: "/visitors" },
+  { name: "QR Scan", icon: <FaUserFriends />, path: "/qr-scan" },
+];
+
+const accountantMenu = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/accountant" },
+  { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
+  { name: "Expenses", icon: <FaMoneyBill />, path: "/expenses" },
+  { name: "Invoices", icon: <FaMoneyBill />, path: "/invoices" },
+];
+const residentMenu = [
   { name: "Dashboard", icon: <FaTachometerAlt />, path: "/user" },
   { name: "Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
   { name: "Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
   { name: "Maintenance", icon: <FaTools />, path: "/maintenance" },
   { name: "Payments", icon: <FaMoneyBill />, path: "/payments" },
 ];
-const menu =
-    user?.role === "ADMIN" ||
-    user?.role === "SUPER_ADMIN"
-      ? adminMenu
-      : userMenu;
+const commonMenu = [
+  {
+    name: "Profile",
+    path: "/profile",
+    icon: <FaUser />,
+  },
+
+  {
+    name: "Settings",
+    path: "/settings",
+    icon: <FaCog />,
+  },
+
+  {
+    name: "Logout",
+    path: "/logout",
+    icon: <FaSignOutAlt />,
+  },
+];
+// if (user.role === "ADMIN") {
+//   menu = [
+//     ...adminMenu,
+//     ...commonMenu
+//   ];
+// }
+
+// if (user.role === "RESIDENT") {
+//   menu = [
+//     ...residentMenu,
+//     ...commonMenu
+//   ];
+// }
+
+// if (user.role === "GUARD") {
+//   menu = [
+//     ...guardMenu,
+//     ...commonMenu
+//   ];
+// }
+
+// if (user.role === "ACCOUNTANT") {
+//   menu = [
+//     ...accountantMenu,
+//     ...commonMenu
+//   ];
+// }
+
+// if (user.role === "SUPER_ADMIN") {
+//   menu = [
+//     ...superAdminMenu,
+//     ...commonMenu
+//   ];
+// }
+let menu = [];
+
+if (user?.role === "SUPER_ADMIN") {
+  menu = [...superAdminMenu, ...commonMenu];
+}
+else if (user?.role === "ADMIN") {
+  menu = [...adminMenu, ...commonMenu];
+}
+else if (user?.role === "ACCOUNTANT") {
+  menu = [...accountantMenu, ...commonMenu];
+}
+else if (user?.role === "GUARD") {
+  menu = [...guardMenu, ...commonMenu];
+}
+else {
+  menu = [...residentMenu, ...commonMenu];
+}
 
   return (
     <div

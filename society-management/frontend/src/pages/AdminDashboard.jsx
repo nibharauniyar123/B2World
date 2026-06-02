@@ -30,6 +30,18 @@ function AdminDashboard() {
             <h3>📅 Bookings</h3>
             <p>Track bookings</p>
           </div>
+          <button
+ onClick={() =>
+  axios.post("/maintenance", {
+   userId: 1,
+   amount: 2500,
+   month: "June 2026",
+   dueDate: "2026-06-15",
+  })
+ }
+>
+ Generate Bill
+</button>
         </div>
       </div>
     </Layout>

@@ -19,13 +19,16 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       // nav("/dashboard");
-      const user = res.data.user;
+const user = res.data.user;
 
-if (
-  user.role === "ADMIN" ||
-  user.role === "SUPER_ADMIN"
-) {
+if (user.role === "SUPER_ADMIN") {
+  nav("/super-admin");
+} else if (user.role === "ADMIN") {
   nav("/admin");
+} else if (user.role === "ACCOUNTANT") {
+  nav("/accountant");
+} else if (user.role === "GUARD") {
+  nav("/guard");
 } else {
   nav("/user");
 }

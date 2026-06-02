@@ -1,33 +1,17 @@
 import express from "express";
 
 import {
-  getMaintenance,
   createMaintenance,
-  deleteMaintenance,
-  updateMaintenance,
+  getMaintenanceBills,
+  markPaid,
 } from "../controllers/maintenanceController.js";
 
-const router =
-  express.Router();
+const router = express.Router();
 
-router.get(
-  "/",
-  getMaintenance
-);
+router.post("/", createMaintenance);
 
-router.post(
-  "/",
-  createMaintenance
-);
+router.get("/", getMaintenanceBills);
 
-router.delete(
-  "/:id",
-  deleteMaintenance
-);
-
-router.put(
-  "/:id",
-  updateMaintenance
-);
+router.put("/:id", markPaid);
 
 export default router;

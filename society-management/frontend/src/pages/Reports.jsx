@@ -1,283 +1,360 @@
-// // import { useEffect, useState } from "react";
-// // import axios from "../utils/axios";
-// // import Layout from "../components/Layout";
-
-// // function Reports() {
-// //   const [reports, setReports] = useState({});
-
-// //   const fetchReports = async () => {
-// //     try {
-// //       const res = await axios.get("/reports");
-// //       setReports(res.data);
-
-// //     } catch (error) {
-// //       console.log(error);
-// //     }
-// //   };
-
-// //   useEffect(() => {
-// //     fetchReports();
-// //   }, []);
-
-// //   return (
-// //     <Layout>
-// //       <div style={styles.container}>
-// //         <h1>Reports Dashboard</h1>
-
-// //         <div style={styles.grid}>
-// //           <div style={styles.card}>
-// //             <h3>Total Users</h3>
-// //             <h2>{reports.users}</h2>
-// //           </div>
-
-// //           <div style={styles.card}>
-// //             <h3>Total Complaints</h3>
-// //             <h2>{reports.complaints}</h2>
-// //           </div>
-
-// //           <div style={styles.card}>
-// //             <h3>Total Bookings</h3>
-// //             <h2>{reports.bookings}</h2>
-// //           </div>
-
-// //           <div style={styles.card}>
-// //             <h3>Total Maintenance</h3>
-// //             <h2>{reports.maintenance}</h2>
-// //           </div>
-// //         </div>
-// //       </div>
-// //     </Layout>
-// //   );
-// // }
-
-// // export default Reports;
-
-// const styles = {
-//   container: {
-//     padding: "20px",
-//   },
-
-//   grid: {
-//     display: "grid",
-//     gridTemplateColumns:
-//       "repeat(auto-fit,minmax(220px,1fr))",
-//     gap: "20px",
-//     marginTop: "20px",
-//   },
-
-//   card: {
-//     background: "#fff",
-//     padding: "20px",
-//     borderRadius: "10px",
-//     boxShadow:
-//       "0 4px 10px rgba(0,0,0,0.05)",
-//   },
-// };
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "../utils/axios";
-import Layout from "../components/Layout";
-
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Legend,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  LineChart,
+  Line,
+} from "recharts";
+import { jsPDF } from "jspdf";
 function Reports() {
+  const [report, setReport] = useState(null);
 
-  const [stats, setStats] =
-    useState({
-      totalExpenses: 0,
-      totalVendors: 0,
-      totalComplaints: 0,
-      totalVisitors: 0,
-    });
+useEffect(() => {
+  loadReports();
+}, []);
 
-  // =========================
-  // FETCH REPORTS
-  // =========================
+const loadReports = async () => {
+  const res = await axios.get("/reports");
 
-  const fetchReports =
-    async () => {
+  setReport(res.data);
+};
+const openCount =
+  report?.complaints?.filter(c => c.status === "OPEN").length || 0;
 
-      try {
+const resolvedCount =
+  report?.complaints?.filter(c => c.status === "RESOLVED").length || 0;
 
-        const [
-          expensesRes,
-          vendorsRes,
-          complaintsRes,
-          visitorsRes,
-        ] = await Promise.all([
-          axios.get("/expenses"),
-          axios.get("/vendors"),
-          axios.get("/complaints"),
-          axios.get("/visitors"),
-        ]);
+const inProgressCount =
+  report?.complaints?.filter(c => c.status === "IN_PROGRESS").length || 0;
 
-        const totalExpenseAmount =
-          expensesRes.data.reduce(
-            (sum, item) =>
-              sum + item.amount,
-            0
-          );
+  const complaintData = [
+  {
+    name: "Open",
+    value: openCount,
+  },
+  {
+    name: "In Progress",
+    value: inProgressCount,
+  },
+  {
+    name: "Resolved",
+    value: resolvedCount,
+  },
+];
+  const revenueData = [
+    { month: "Jan", revenue: 12000 },
+    { month: "Feb", revenue: 18000 },
+    { month: "Mar", revenue: 22000 },
+    { month: "Apr", revenue: 26000 },
+  ];
 
-        setStats({
+  const expenseData = [
+    { name: "Maintenance", value: 4000 },
+    { name: "Security", value: 3000 },
+    { name: "Cleaning", value: 2000 },
+    { name: "Electricity", value: 5000 },
+  ];
+  const compareData = [
+  {
+    month: "Jan",
+    revenue: 20000,
+    expense: 10000,
+  },
 
-          totalExpenses:
-            totalExpenseAmount,
+  {
+    month: "Feb",
+    revenue: 25000,
+    expense: 12000,
+  },
 
-          totalVendors:
-            vendorsRes.data.length,
+  {
+    month: "Mar",
+    revenue: 30000,
+    expense: 15000,
+  },
+];
+  const visitorData = [
+  { month: "Jan", visitors: 40 },
+  { month: "Feb", visitors: 55 },
+  { month: "Mar", visitors: 70 },
+  { month: "Apr", visitors: 90 },
+];
 
-          totalComplaints:
-            complaintsRes.data.length,
+  const COLORS = [
+    "#2563eb",
+    "#16a34a",
+    "#dc2626",
+    "#f59e0b",
+  ];
+  const downloadReport = () => {
+  const doc = new jsPDF();
 
-          totalVisitors:
-            visitorsRes.data.length,
-        });
+  doc.setFontSize(18);
+  doc.text("Society Management Report", 20, 20);
 
-      } catch (error) {
+  doc.setFontSize(12);
 
-        console.log(error);
-      }
-    };
+  doc.text(
+    `Revenue: Rs ${report?.totalRevenue || 0}`,
+    20,
+    40
+  );
 
-  useEffect(() => {
+  doc.text(
+    `Expenses: Rs ${report?.totalExpense || 0}`,
+    20,
+    55
+  );
 
-    fetchReports();
+  doc.text(
+    `Complaints: ${report?.complaints?.length || 0}`,
+    20,
+    70
+  );
 
-  }, []);
+  doc.text(
+    `Visitors: ${report?.visitors?.length || 0}`,
+    20,
+    85
+  );
 
+  doc.text(
+    `Open Complaints: ${openCount}`,
+    20,
+    105
+  );
+
+  doc.text(
+    `Resolved Complaints: ${resolvedCount}`,
+    20,
+    120
+  );
+
+  doc.text(
+    `In Progress Complaints: ${inProgressCount}`,
+    20,
+    135
+  );
+
+  doc.save("report.pdf");
+};
   return (
+    <div style={styles.container}>
+      <h1>Reports & Analytics</h1>
 
-    <Layout>
-
-      <div style={styles.container}>
-
-        {/* TITLE */}
-
-        <h1 style={styles.heading}>
-          Reports Dashboard
-        </h1>
-
-        {/* GRID */}
-
-        <div style={styles.grid}>
-
-          {/* EXPENSES */}
-
-          <div style={styles.card}>
-
-            <h3 style={styles.title}>
-              Total Expenses
-            </h3>
-
-            <h2 style={styles.value}>
-              Rs. {stats.totalExpenses}
-            </h2>
-
-          </div>
-
-          {/* VENDORS */}
-
-          <div style={styles.card}>
-
-            <h3 style={styles.title}>
-              Total Vendors
-            </h3>
-
-            <h2 style={styles.value}>
-              {stats.totalVendors}
-            </h2>
-
-          </div>
-
-          {/* COMPLAINTS */}
-
-          <div style={styles.card}>
-
-            <h3 style={styles.title}>
-              Total Complaints
-            </h3>
-
-            <h2 style={styles.value}>
-              {stats.totalComplaints}
-            </h2>
-
-          </div>
-
-          {/* VISITORS */}
-
-          <div style={styles.card}>
-
-            <h3 style={styles.title}>
-              Total Visitors
-            </h3>
-
-            <h2 style={styles.value}>
-              {stats.totalVisitors}
-            </h2>
-
-          </div>
-
+      <div style={styles.cards}>
+        <div style={styles.card}>
+          <h3>Total Revenue</h3>
+         <h2>Rs {report?.totalRevenue || 0}</h2>
         </div>
 
-      </div>
+        <div style={styles.card}>
+          <h3>Total Expenses</h3>
+          <h2>Rs{report?.totalExpense || 0}</h2>
+        </div>
 
-    </Layout>
+        <div style={styles.card}>
+          <h3>Complaints</h3>
+          <h2>{report?.complaints?.length || 0}</h2>
+        </div>
+
+        <div style={styles.card}>
+          <h3>Visitors</h3>
+          <h2>{report?.visitors?.length || 0}</h2>
+        </div>
+      </div>
+      <button
+  onClick={downloadReport}
+  style={{
+    background: "#2563eb",
+    color: "#fff",
+    padding: "12px 20px",
+    border: "none",
+    borderRadius: "8px",
+    marginBottom: "20px",
+  }}
+>
+  Download Report
+</button>
+<div style={styles.chartBox}>
+  <h2>Monthly Revenue</h2>
+
+  <ResponsiveContainer width="100%" height={300}>
+    <BarChart data={revenueData}>
+      <XAxis dataKey="month" />
+      <YAxis />
+      <Tooltip />
+      <Bar
+        dataKey="revenue"
+        fill="#2563eb"
+      />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
+<div style={styles.chartBox}>
+  <h2>Revenue vs Expense</h2>
+
+  <ResponsiveContainer width="100%" height={300}>
+    <BarChart data={compareData}>
+      <XAxis dataKey="month" />
+      <YAxis />
+      <Tooltip />
+      <Bar
+        dataKey="revenue"
+        fill="#2563eb"
+      />
+      <Bar
+        dataKey="expense"
+        fill="#dc2626"
+      />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+<div style={styles.chartBox}>
+  <h2>Complaint Status</h2>
+<ResponsiveContainer width="100%" height={350}>
+  <PieChart>
+    <Pie
+      data={complaintData}
+      dataKey="value"
+      nameKey="name"
+      outerRadius={120}
+      label
+    >
+      <Pie
+  data={complaintData}
+  dataKey="value"
+  nameKey="name"
+  outerRadius={120}
+  label={({name,value}) =>
+    `${name}: ${value}`
+  }
+/>
+      <Cell fill="#ff4d4f" />
+      <Cell fill="#faad14" />
+      <Cell fill="#52c41a" />
+    </Pie>
+
+    <Tooltip />
+    <Legend />
+  </PieChart>
+</ResponsiveContainer>
+</div>
+<div style={styles.chartBox}>
+  <h2>Visitor Trend</h2>
+
+  <ResponsiveContainer
+    width="100%"
+    height={300}
+  >
+    <BarChart data={compareData}>
+      <XAxis dataKey="month" />
+      <YAxis />
+      <Tooltip />
+      <Bar
+        dataKey="revenue"
+        fill="#2563eb"
+      />
+     
+    </BarChart>
+  </ResponsiveContainer>
+</div>    
+      <div style={styles.chartBox}>
+        <h2>Expense Distribution</h2>
+
+        <ResponsiveContainer
+          width="100%"
+          height={300}
+        >
+          <PieChart>
+            <Pie
+              data={expenseData}
+              dataKey="value"
+              outerRadius={120}
+              label
+            >
+              {expenseData.map(
+                (entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={
+                      COLORS[
+                        index % COLORS.length
+                      ]
+                    }
+                  />
+                )
+              )}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+          
+{/* <PieChart width={400} height={300}>
+  <Pie
+    data={complaintData}
+    cx="50%"
+    cy="50%"
+    outerRadius={100}
+    dataKey="value"
+    label
+  >
+    <Cell fill="#ef4444" />
+    <Cell fill="#f59e0b" />
+    <Cell fill="#22c55e" />
+  </Pie>
+
+  <Tooltip />
+  <Legend />
+</PieChart> */}
+         </ResponsiveContainer> 
+      </div>
+    </div>
   );
 }
 
-export default Reports;
-
-// =========================
-// STYLES
-// =========================
-
 const styles = {
-
   container: {
-    padding: "20px",
-    background: "#f5f7fb",
+    padding: "25px",
+    background: "#f1f5f9",
     minHeight: "100vh",
   },
 
-  heading: {
-    fontSize: "36px",
-    fontWeight: "700",
-    color: "#1e293b",
-    marginBottom: "25px",
-  },
-
-  grid: {
+  cards: {
     display: "grid",
-
     gridTemplateColumns:
       "repeat(auto-fit,minmax(220px,1fr))",
-
     gap: "20px",
-
-    marginTop: "20px",
+    marginBottom: "30px",
   },
 
   card: {
     background: "#fff",
-
-    padding: "25px",
-
-    borderRadius: "16px",
-
+    padding: "20px",
+    borderRadius: "12px",
     boxShadow:
-      "0 4px 15px rgba(0,0,0,0.08)",
-
-    transition: "0.3s",
+      "0 4px 12px rgba(0,0,0,0.08)",
   },
 
-  title: {
-    fontSize: "18px",
-    fontWeight: "600",
-    color: "#64748b",
-    marginBottom: "15px",
-  },
-
-  value: {
-    fontSize: "34px",
-    fontWeight: "700",
-    color: "#2563eb",
+  chartBox: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "12px",
+    marginBottom: "25px",
+    boxShadow:
+      "0 4px 12px rgba(0,0,0,0.08)",
   },
 };
+
+export default Reports;
