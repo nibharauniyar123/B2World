@@ -32,6 +32,7 @@ model User {
   bookings Booking[]
 
   payments Payment[]
+   kyc KYC?
 }
 
 model Society {
@@ -90,13 +91,22 @@ model Complaint {
 }
 
 model Flat {
-  id        Int     @id @default(autoincrement())
-  block     String
-  flatNo    String
-  floor     String  @default("")
-  ownerName String  @default("")
+
+  id Int @id @default(autoincrement())
+
+  block String
+
+  flatNo String
+
+  floor String @default("")
+
+  ownerName String @default("")
+
+  occupancyStatus String @default("VACANT")
+
   societyId Int
-  society   Society @relation(fields: [societyId], references: [id])
+
+  society Society @relation(fields:[societyId], references:[id])
 }
 
 model Visitor {
@@ -239,4 +249,33 @@ model Payment {
   createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+model ParkingSlot {
+  id Int @id @default(autoincrement())
+
+  slotNumber String
+
+  status String @default("AVAILABLE")
+
+  flatId Int?
+
+  createdAt DateTime @default(now())
+}
+model KYC {
+
+  id Int @id @default(autoincrement())
+
+  citizenship String?
+
+  passport String?
+
+  profilePhoto String?
+
+  documentUrl String?
+
+  userId Int @unique
+
+  user User @relation(fields:[userId], references:[id])
+
+  createdAt DateTime @default(now())
 }

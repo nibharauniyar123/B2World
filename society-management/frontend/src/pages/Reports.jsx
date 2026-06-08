@@ -97,6 +97,40 @@ const inProgressCount =
     "#dc2626",
     "#f59e0b",
   ];
+const flats = report?.flats || [];
+
+const occupied = flats.filter(
+  (f) => f.occupancyStatus === "OWNER_OCCUPIED"
+).length;
+
+const tenantOccupied = flats.filter(
+  (f) => f.occupancyStatus === "TENANT_OCCUPIED"
+).length;
+
+const vacant = flats.filter(
+  (f) => f.occupancyStatus === "VACANT"
+).length;
+
+return (
+  <div className="stats-grid">
+
+  <div className="card">
+    <h3>Occupied Flats</h3>
+    <p>{occupied}</p>
+  </div>
+
+  <div className="card">
+    <h3>Vacant Flats</h3>
+    <p>{vacant}</p>
+  </div>
+
+  <div className="card">
+    <h3>Tenant Occupied</h3>
+    <p>{tenantOccupied}</p>
+  </div>
+
+</div>
+);
   const downloadReport = () => {
   const doc = new jsPDF();
 

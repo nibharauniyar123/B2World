@@ -37,6 +37,7 @@ res.json({
   complaints,
   visitors,
   expenses,
+  flats,
   totalRevenue,
   totalExpense,
 

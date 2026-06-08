@@ -32,7 +32,8 @@ import Settings from "./pages/Settings"
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import GuardDashboard from "./pages/GuardDashboard";
 import AccountantDashboard from "./pages/AccountantDashboard";
-
+import Parking from "./pages/Parking";
+import KYCUpload from "./pages/KYCUpload";
 
 function App(){
 
@@ -137,12 +138,13 @@ function App(){
 <Route path="/payments" element={<Payments />} />
 <Route path="/expenses" element={<Expenses />} />
 <Route path="/vendors" element={<Vendors />} />
+<Route path="/parking" element={<Parking />} /> 
+<Route path="/kyc-upload" element={<KYCUpload />} />
   </Routes>
 
  )
 
 }
-
 
 export default App
 
