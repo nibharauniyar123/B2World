@@ -27,12 +27,12 @@ function Bookings() {
     async () => {
       const res =
         await axios.get(
-          "/bookings"
+          "/api/bookings"
         );
 
       const userRes =
         await axios.get(
-          "/users"
+          "/api/users"
         );
 
       setData(
@@ -57,7 +57,7 @@ function Bookings() {
         setLoading(true);
 
         await axios.post(
-          "/bookings",
+          "/api/bookings",
           form
         );
 
@@ -83,7 +83,7 @@ function Bookings() {
   const handleDelete =
     async (id) => {
       await axios.delete(
-        `/bookings/${id}`
+        `/api/bookings/${id}`
       );
 
       fetchData();
@@ -95,7 +95,7 @@ function Bookings() {
       status
     ) => {
       await axios.put(
-        `/bookings/${id}`,
+        `/api/bookings/${id}`,
         { status }
       );
 

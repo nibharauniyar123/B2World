@@ -31,7 +31,7 @@ function Users() {
   // ===============================
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("/users");
+      const res = await axios.get("/api/users");
       setUsers(res.data.users || res.data);
     } catch (error) {
       console.log("Fetch Users Error:", error);
@@ -52,7 +52,7 @@ function Users() {
 const handleCreate = async () => {
   try {
 
-    await axios.post("/users", {
+    await axios.post("/api/users", {
       name: form.name,
       email: form.email,
       password: form.password,
@@ -75,7 +75,7 @@ const handleCreate = async () => {
   // ===============================
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/users/${id}`);
+      await axios.delete(`/api/users/${id}`);
       fetchUsers();
     } catch (error) {
       console.log("Delete Error:", error);

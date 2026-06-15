@@ -13,7 +13,7 @@ function Login() {
     try {
       setLoading(true);
 
-      const res = await axios.post("/auth/login", form);
+      const res = await axios.post("/api/auth/login", form);
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));

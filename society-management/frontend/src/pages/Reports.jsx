@@ -97,6 +97,12 @@ const inProgressCount =
     "#dc2626",
     "#f59e0b",
   ];
+const avgResolutionHours =
+  report.avgResolutionTime
+    ? Math.round(
+        report.avgResolutionTime / 3600000
+      )
+    : 0;
 const flats = report?.flats || [];
 
 const occupied = flats.filter(
@@ -128,6 +134,10 @@ return (
     <h3>Tenant Occupied</h3>
     <p>{tenantOccupied}</p>
   </div>
+  <div className="card">
+  <h3>Avg Resolution Time</h3>
+  <p>{avgResolutionHours} hrs</p>
+</div>
 
 </div>
 );

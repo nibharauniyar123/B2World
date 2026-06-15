@@ -32,7 +32,7 @@ model User {
   bookings Booking[]
 
   payments Payment[]
-   kyc KYC?
+  kyc      KYC?
 }
 
 model Society {
@@ -64,7 +64,6 @@ enum Role {
   TENANT
   GUARD
   ACCOUNTANT
-  
 }
 
 model Complaint {
@@ -76,10 +75,15 @@ model Complaint {
   image String?
 
   assignedStaff String?
+  assignedAt    DateTime?
   feedback      String?
   rating        Int?
   resolvedAt    DateTime?
   status        String    @default("OPEN")
+
+  vendorId Int?
+
+  vendor Vendor? @relation(fields: [vendorId], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -91,7 +95,6 @@ model Complaint {
 }
 
 model Flat {
-
   id Int @id @default(autoincrement())
 
   block String
@@ -106,7 +109,7 @@ model Flat {
 
   societyId Int
 
-  society Society @relation(fields:[societyId], references:[id])
+  society Society @relation(fields: [societyId], references: [id])
 }
 
 model Visitor {
@@ -162,13 +165,14 @@ model Subscription {
 }
 
 model Vendor {
-  id        Int       @id @default(autoincrement())
-  name      String
-  service   String
-  phone     String
-  address   String
-  createdAt DateTime  @default(now())
-  expenses  Expense[]
+  id         Int         @id @default(autoincrement())
+  name       String
+  service    String
+  phone      String
+  address    String
+  createdAt  DateTime    @default(now())
+  expenses   Expense[]
+  complaints Complaint[]
 }
 
 model Expense {
@@ -250,6 +254,7 @@ model Payment {
 
   user User @relation(fields: [userId], references: [id])
 }
+
 model ParkingSlot {
   id Int @id @default(autoincrement())
 
@@ -261,8 +266,8 @@ model ParkingSlot {
 
   createdAt DateTime @default(now())
 }
-model KYC {
 
+model KYC {
   id Int @id @default(autoincrement())
 
   citizenship String?
@@ -275,7 +280,7 @@ model KYC {
 
   userId Int @unique
 
-  user User @relation(fields:[userId], references:[id])
+  user User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
 }

@@ -450,7 +450,7 @@ const [userId, setUserId] = useState("");
 
   const loadBills = async () => {
     try {
-      const res = await axios.get("/maintenance");
+      const res = await axios.get("/api/maintenance");
       setBills(res.data);
     } catch (err) {
       console.log(err);
@@ -463,7 +463,7 @@ const [userId, setUserId] = useState("");
 
   const generateBill = async () => {
     try {
-      await axios.post("/maintenance", {
+      await axios.post("/api/maintenance", {
         userId, 
         amount,
         month,
@@ -481,7 +481,7 @@ const [userId, setUserId] = useState("");
 
   const markPaid = async (id) => {
     try {
-      await axios.put(`/maintenance/${id}`);
+      await axios.put(`/api/maintenance/${id}`);
 
       alert("Bill Paid");
 

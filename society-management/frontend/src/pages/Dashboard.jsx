@@ -44,12 +44,12 @@ const navigate = useNavigate();
         maintenanceRes,
         bookingRes,
       ] = await Promise.all([
-        axios.get("/users"),
-        axios.get("/societies"),
-        axios.get("/complaints"),
-        axios.get("/visitors"),
-        axios.get("/maintenance"),
-        axios.get("/bookings"),
+        axios.get("/api/users"),
+        axios.get("/api/societies"),
+        axios.get("/api/complaints"),
+        axios.get("/api/visitors"),
+        axios.get("/api/maintenance"),
+        axios.get("/api/bookings"),
       ]);
 
       setStats({

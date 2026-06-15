@@ -15,7 +15,7 @@ function Payments() {
 
   const fetchPayments = async () => {
     try {
-      const res = await axios.get("/payments");
+      const res = await axios.get("/api/payments");
       setPayments(res.data);
     } catch (error) {
       console.log(error);
@@ -28,7 +28,7 @@ function Payments() {
 
   const handleCreate = async () => {
     try {
-      await axios.post("/payments", form);
+      await axios.post("/api/payments", form);
 
       alert("Payment Generated Successfully");
 
@@ -49,7 +49,7 @@ function Payments() {
 
   const markPaid = async (id) => {
     try {
-      await axios.put(`/payments/${id}`);
+      await axios.put(`/api/payments/${id}`);
 
       fetchPayments();
 

@@ -14,7 +14,7 @@ const Vendors = () => {
 
   const fetchVendors = async () => {
     try {
-      const res = await axios.get("/vendors");
+      const res = await axios.get("/api/vendors");
       setVendors(res.data);
     } catch (error) {
       console.log(error);
@@ -29,7 +29,7 @@ const Vendors = () => {
     e.preventDefault();
 
     try {
-      await axios.post("/vendors", form);
+      await axios.post("/api/vendors", form);
 
       alert("Vendor Added Successfully");
 
@@ -49,7 +49,7 @@ const Vendors = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/vendors/${id}`);
+      await axios.delete(`/api/vendors/${id}`);
 
       fetchVendors();
     } catch (error) {

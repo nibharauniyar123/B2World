@@ -10,6 +10,7 @@ export const getReports = async (req, res) => {
     const visitors = await prisma.visitor.findMany();
 
     const expenses = await prisma.expense.findMany();
+    const flats = await prisma.flat.findMany();
 
     const totalRevenue = payments.reduce(
       (sum, p) => sum + p.totalAmount,
@@ -28,9 +29,24 @@ const progressComplaints = complaints.filter(
   (c) => c.status === "IN_PROGRESS"
 ).length;
 
-const resolvedComplaints = complaints.filter(
-  (c) => c.status === "RESOLVED"
-).length;
+// const resolvedComplaints = complaints.filter(
+//   (c) => c.status === "RESOLVED"
+// ).length;
+const resolvedWithTime = complaints.filter(
+  (c) => c.assignedAt && c.resolvedAt
+);
+
+const avgResolutionTime =
+  resolvedWithTime.length > 0
+    ? resolvedWithTime.reduce((sum, c) => {
+        return (
+          sum +
+          (new Date(c.resolvedAt) -
+            new Date(c.assignedAt))
+        );
+      }, 0) / resolvedWithTime.length
+    : 0;
+    
 
 res.json({
   payments,
@@ -40,7 +56,8 @@ res.json({
   flats,
   totalRevenue,
   totalExpense,
-
+  
+   avgResolutionTime,
   complaintStats: {
     open: openComplaints,
     progress: progressComplaints,

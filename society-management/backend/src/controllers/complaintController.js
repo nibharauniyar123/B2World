@@ -7,66 +7,6 @@ const prisma = new PrismaClient();
 // CREATE COMPLAINT
 // ==============================
 
-// export const createComplaint = async (req, res) => {
-//   try {
-
-//     const {
-//   title,
-//   description,
-//   userId,
-//   societyId,
-//   assignedStaff,
-//   feedback,
-//   rating,
-  
-// } = req.body;
-
-//     // uploaded image
-//     const image = req.file
-//       ? `/uploads/${req.file.filename}`
-//       : null;
-//  const complaint = await prisma.complaint.create({
-//   data: {
-//     title,
-//     description,
-
-//     image: req.file
-//       ? `/uploads/${req.file.filename}`
-//       : null,
-
-//     assignedStaff,
-
-//     feedback,
-
-//     rating: Number(rating),
-
-//     status: "OPEN",
-
-//     user: {
-//       connect: {
-//         id: Number(userId),
-//       },
-//     },
-
-//     society: {
-//       connect: {
-//         id: Number(societyId),
-//       },
-//     },
-//   },
-// });
-
-//     res.status(201).json(complaint);
-
-//   } catch (error) {
-
-//     console.log(error);
-
-//     res.status(500).json({
-//       message: "Complaint create failed",
-//     });
-//   }
-// };
 export const createComplaint = async (req, res) => {
   try {
     const {
@@ -77,6 +17,7 @@ export const createComplaint = async (req, res) => {
       assignedStaff,
       feedback,
       rating,
+      vendorId,
     } = req.body;
 
     const complaint = await prisma.complaint.create({
@@ -89,8 +30,12 @@ export const createComplaint = async (req, res) => {
           : null,
 
         assignedStaff,
+
         feedback,
-        rating: Number(rating),
+
+        rating: rating
+          ? Number(rating)
+          : null,
 
         status: "OPEN",
 
@@ -105,14 +50,25 @@ export const createComplaint = async (req, res) => {
             id: Number(societyId),
           },
         },
+
+        ...(vendorId
+          ? {
+              vendor: {
+                connect: {
+                  id: Number(vendorId),
+                },
+              },
+            }
+          : {}),
       },
     });
 
     res.status(201).json(complaint);
   } catch (error) {
     console.log(error);
+
     res.status(500).json({
-      message: "Complaint create failed",
+      message: error.message,
     });
   }
 };
@@ -124,12 +80,33 @@ export const createComplaint = async (req, res) => {
 export const getComplaints = async (req, res) => {
   try {
 
-    const complaints =
-      await prisma.complaint.findMany({
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
+    // const complaints =
+    //   await prisma.complaint.findMany({
+    //     orderBy: {
+    //       createdAt: "desc",
+    //     },
+    //   });
+  // const complaints =
+  // await prisma.complaint.findMany({
+  //   include: {
+  //     vendor: true,
+  //   },
+
+  //   orderBy: {
+  //     createdAt: "desc",
+  //   },
+  // });
+  const complaints =
+ await prisma.complaint.findMany({
+   include:{
+     user:true,
+     society:true,
+     vendor:true
+   },
+   orderBy:{
+     createdAt:"desc"
+   }
+ });
 
     res.json(complaints);
 
@@ -282,4 +259,125 @@ export const addFeedback =
       message: "Complaint update failed",
     });
   }
+};
+// export const assignComplaint = async(req,res)=>{
+
+//   const complaint = await prisma.complaint.update({
+
+//     where:{
+//       id:Number(req.params.id)
+//     },
+
+//     data:{
+//       assignedStaff:req.body.assignedStaff,
+//       assignedAt:new Date(),
+//       status:"IN_PROGRESS"
+//     }
+
+//   });
+
+//   res.json(complaint);
+
+// };
+export const assignComplaint =
+async(req,res)=>{
+
+  try{
+
+    const complaint =
+      await prisma.complaint.update({
+
+        where:{
+          id:Number(req.params.id)
+        },
+
+        data:{
+          assignedStaff:req.body.assignedStaff,
+
+          assignedAt:new Date(),
+
+          status:"IN_PROGRESS"
+        }
+
+      });
+
+    res.json(complaint);
+
+  }catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      message:"Assign failed"
+    });
+
+  }
+
+};
+// 
+export const resolveComplaint =
+async(req,res)=>{
+
+  try{
+
+    const complaint =
+      await prisma.complaint.update({
+
+        where:{
+          id:Number(req.params.id)
+        },
+
+        data:{
+          status:"RESOLVED",
+
+          resolvedAt:new Date()
+        }
+
+      });
+
+    res.json(complaint);
+
+  }catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      message:"Resolve failed"
+    });
+
+  }
+
+};
+// export const assignVendor = async(req,res)=>{
+
+//   const complaint =
+//    await prisma.complaint.update({
+
+//     where:{
+//       id:Number(req.params.id)
+//     },
+
+//     data:{
+//       vendorId:req.body.vendorId,
+//       status:"IN_PROGRESS"
+//     }
+
+//    });
+
+//    res.json(complaint);
+
+// };
+export const assignVendor = async(req,res)=>{
+  const complaint =
+   await prisma.complaint.update({
+      where:{
+        id:Number(req.params.id)
+      },
+      data:{
+        vendorId:Number(req.body.vendorId),
+        status:"IN_PROGRESS"
+      }
+   });
+
+   res.json(complaint);
 };

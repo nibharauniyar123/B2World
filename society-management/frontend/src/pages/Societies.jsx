@@ -280,7 +280,7 @@ function Societies() {
   // =========================
   const fetchSocieties = async () => {
     try {
-      const res = await axios.get("/societies");
+      const res = await axios.get("/api/societies");
       setSocieties(res.data);
     } catch (error) {
       console.log(error);
@@ -300,7 +300,7 @@ function Societies() {
     try {
       setLoading(true);
 
-      await axios.post("/societies", form);
+      await axios.post("/api/societies", form);
 
       setForm({
         name: "",
@@ -321,7 +321,7 @@ function Societies() {
   // =========================
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/societies/${id}`);
+      await axios.delete(`/api/societies/${id}`);
       fetchSocieties();
     } catch (error) {
       alert("Delete failed");
@@ -350,7 +350,7 @@ function Societies() {
     try {
       setLoading(true);
 
-      await axios.put(`/societies/${editId}`, form);
+      await axios.put(`/api/societies/${editId}`, form);
 
       setEditId(null);
 

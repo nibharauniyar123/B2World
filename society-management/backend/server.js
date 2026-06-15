@@ -13,7 +13,7 @@ import adminRoutes from "./src/routes/adminRoutes.js";
 import flatRoutes from "./src/routes/flatRoutes.js";
 import bookingRoutes from "./src/routes/bookingRoutes.js";
 import maintenanceRoutes from "./src/routes/maintenanceRoutes.js";
-import noticeRoutes from "./src/routes/noticeRoutes.js";  
+import noticeRoutes from "./src/routes/noticeRoutes.js";
 import visitorRoutes from "./src/routes/visitorRoutes.js";
 import notificationRoutes from "./src/routes/notificationRoutes.js";
 import reportRoutes from "./src/routes/reportRoutes.js";
@@ -24,14 +24,20 @@ import vendorRoutes from "./src/routes/vendorRoutes.js";
 import expenseRoutes from "./src/routes/expenseRoutes.js";
 import parkingRoutes from "./src/routes/parkingRoutes.js";
 import kycRoutes from "./src/routes/kycRoutes.js";
+
 dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Static files
 app.use("/uploads", express.static("uploads"));
-// routes
+
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/societies", societyRoutes);
@@ -40,23 +46,35 @@ app.use("/api/complaints", complaintRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/flats", flatRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/notices", noticeRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/notices", noticeRoutes);
 app.use("/api/visitors", visitorRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/uploads", express.static("uploads"));
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/parking", parkingRoutes);
 app.use("/api/kyc", kycRoutes);
-app.get("/api", (_req, res) => {
-  res.send("Society Management API Running");
+
+// Test Route
+app.get("/", (req, res) => {
+  res.send("Society Management API is Running 🚀");
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.get("/api", (req, res) => {
+  res.send("Society Management API is Running 🚀");
+});
+
+// Global Error Handler (Optional but recommended)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
