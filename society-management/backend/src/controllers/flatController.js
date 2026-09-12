@@ -7,11 +7,19 @@ const prisma = new PrismaClient();
 // ============================
 export const getFlats = async (req, res) => {
   try {
+    // const flats = await prisma.flat.findMany({
+    //   orderBy: {
+    //     id: "desc",
+    //   },
+    // });
     const flats = await prisma.flat.findMany({
-      orderBy: {
-        id: "desc",
-      },
-    });
+  include: {
+    society: true,
+  },
+  orderBy: {
+    id: "desc",
+  },
+});
 
     res.json(flats);
   } catch (error) {
@@ -49,7 +57,7 @@ export const createFlat = async (req, res) => {
 export const updateFlat = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { block, flatNo, floor, owner, societyId } = req.body;
+    const { block, flatNo, floor, ownerName, societyId } = req.body;
 
     const updatedFlat = await prisma.flat.update({
       where: { id },
@@ -57,7 +65,7 @@ export const updateFlat = async (req, res) => {
         block,
         flatNo,
         floor,
-        owner,
+        ownerName,
         societyId: Number(societyId),
       },
     });
@@ -66,6 +74,35 @@ export const updateFlat = async (req, res) => {
   } catch (error) {
     console.log("UPDATE ERROR:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+// ============================
+// GET FLAT BY ID
+// ============================
+
+export const getFlatById = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const flat = await prisma.flat.findUnique({
+      where: { id },
+      include: {
+        society: true,
+      },
+    });
+
+    if (!flat) {
+      return res.status(404).json({
+        message: "Flat not found",
+      });
+    }
+
+    res.json(flat);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: error.message,
+    });
   }
 };
 
@@ -83,5 +120,49 @@ export const deleteFlat = async (req, res) => {
     res.json({ message: "Flat deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+export const updateOccupancy = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const { occupancyStatus } = req.body;
+
+    const flat = await prisma.flat.update({
+      where: { id },
+      data: {
+        occupancyStatus,
+      },
+    });
+
+    res.json(flat);
+
+  } catch (error) {
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+export const assignResident = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    const { ownerName } = req.body;
+
+    const flat = await prisma.flat.update({
+      where: { id },
+      data: {
+        ownerName,
+        occupancyStatus: "OCCUPIED",
+      },
+    });
+
+    res.json(flat);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };

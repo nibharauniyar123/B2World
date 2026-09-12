@@ -24,6 +24,7 @@ import vendorRoutes from "./src/routes/vendorRoutes.js";
 import expenseRoutes from "./src/routes/expenseRoutes.js";
 import parkingRoutes from "./src/routes/parkingRoutes.js";
 import kycRoutes from "./src/routes/kycRoutes.js";
+import superAdminRoutes from "./src/routes/superAdminRoutes.js";
 
 dotenv.config();
 
@@ -36,7 +37,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use("/uploads", express.static("uploads"));
-
+// Health Check Route
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Backend is working"
+  });
+});
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -58,7 +65,7 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/parking", parkingRoutes);
 app.use("/api/kyc", kycRoutes);
-
+app.use("/api/super-admin", superAdminRoutes);
 // Test Route
 app.get("/", (req, res) => {
   res.send("Society Management API is Running 🚀");

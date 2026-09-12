@@ -92,7 +92,29 @@ export const isAdmin = (
   next();
 };
 
+export const superAdminOnly = (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Authentication required",
+      });
+    }
 
+    if (req.user.role !== "SUPER_ADMIN") {
+      return res.status(403).json({
+        message: "Super Admin access required",
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("SUPER ADMIN AUTH ERROR:", error);
+
+    res.status(500).json({
+      message: "Authorization failed",
+    });
+  }
+};
 
 
 // DEFAULT EXPORT

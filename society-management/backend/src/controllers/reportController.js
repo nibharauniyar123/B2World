@@ -29,9 +29,9 @@ const progressComplaints = complaints.filter(
   (c) => c.status === "IN_PROGRESS"
 ).length;
 
-// const resolvedComplaints = complaints.filter(
-//   (c) => c.status === "RESOLVED"
-// ).length;
+const resolvedComplaints = complaints.filter(
+  (c) => c.status === "RESOLVED"
+).length;
 const resolvedWithTime = complaints.filter(
   (c) => c.assignedAt && c.resolvedAt
 );

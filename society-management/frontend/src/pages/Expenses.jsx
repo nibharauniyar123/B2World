@@ -167,7 +167,7 @@ const Expenses = () => {
 
         const res =
           await axios.get(
-            "/expenses"
+            "/api/expenses"
           );
 
         setExpenses(
@@ -198,7 +198,7 @@ const Expenses = () => {
       try {
 
         await axios.post(
-          "/expenses",
+          "/api/expenses",
           {
             ...form,
             amount: Number(
@@ -239,7 +239,7 @@ const Expenses = () => {
       try {
 
         await axios.delete(
-          `/expenses/${id}`
+          `/api/expenses/${id}`
         );
 
         fetchExpenses();

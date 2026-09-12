@@ -31,8 +31,9 @@ model User {
 
   bookings Booking[]
 
-  payments Payment[]
-  kyc      KYC?
+  payments   Payment[]
+  kyc        KYC?
+  ownedFlats Flat[]
 }
 
 model Society {
@@ -52,7 +53,10 @@ model Society {
 
   flats Flat[]
 
-  notices Notice[]
+  notices  Notice[]
+  payments Payment[]
+
+  expenses Expense[]
 
   subscriptions Subscription?
 }
@@ -74,14 +78,14 @@ model Complaint {
 
   image String?
 
-  assignedStaff String?
-  assignedAt    DateTime?
-  feedback      String?
-  rating        Int?
-  resolvedAt    DateTime?
-  status        String    @default("OPEN")
-
-  vendorId Int?
+  assignedStaff  String?
+  assignedAt     DateTime?
+  feedback       String?
+  rating         Int?
+  resolvedAt     DateTime?
+  status         String    @default("OPEN")
+  resolutionTime DateTime?
+  vendorId       Int?
 
   vendor Vendor? @relation(fields: [vendorId], references: [id])
 
@@ -104,6 +108,8 @@ model Flat {
   floor String @default("")
 
   ownerName String @default("")
+  ownerId   Int?
+  owner     User?  @relation(fields: [ownerId], references: [id])
 
   occupancyStatus String @default("VACANT")
 
@@ -115,22 +121,40 @@ model Flat {
 model Visitor {
   id Int @id @default(autoincrement())
 
-  name String
-
+  name  String
   phone String
 
   purpose String?
 
+  // Resident / Society information
+  residentId Int?
+  societyId  Int?
+
+  // Visitor information
+  visitorType  String?
+  visitDate    DateTime?
+  expectedTime String?
+
+  // Vehicle information
+  vehicleType   String?
   vehicleNumber String?
 
-  deliveryType String?
+  // Delivery information
+  deliveryType    String?
+  deliveryCompany String?
 
-  qrCode String?
+  // QR information
+  qrCode  String?
+  qrToken String?
 
+  // Status
   status String @default("PENDING")
 
-  checkIn DateTime?
+  // Approval
+  approvedAt DateTime?
 
+  // Entry / Exit
+  checkIn  DateTime?
   checkOut DateTime?
 
   createdAt DateTime @default(now())
@@ -164,25 +188,40 @@ model Subscription {
   society Society @relation(fields: [societyId], references: [id])
 }
 
-model Vendor {
-  id         Int         @id @default(autoincrement())
-  name       String
-  service    String
-  phone      String
-  address    String
-  createdAt  DateTime    @default(now())
-  expenses   Expense[]
-  complaints Complaint[]
+model Expense {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  amount        Float
+  category      String
+  vendorId      Int?
+  date          DateTime
+  paymentMethod String?
+  receipt       String?
+
+  societyId     Int?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vendor        Vendor?  @relation(fields: [vendorId], references: [id])
+  society       Society? @relation(fields: [societyId], references: [id])
 }
 
-model Expense {
-  id        Int      @id @default(autoincrement())
-  title     String
-  amount    Float
-  category  String
-  vendorId  Int?
-  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
-  createdAt DateTime @default(now())
+model Vendor {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String?
+  email   String?
+  service String?
+  address String?
+  status  String  @default("ACTIVE")
+
+  expenses Expense[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime @default(now())
+  Complaint Complaint[]
 }
 
 model Maintenance {
@@ -242,17 +281,26 @@ model Notice {
 }
 
 model Payment {
-  id                Int      @id @default(autoincrement())
-  userId            Int
+  id Int @id @default(autoincrement())
+
   amount            Float
   waterCharge       Float
   electricityCharge Float
   lateFee           Float
   totalAmount       Float
-  status            String   @default("PENDING")
-  createdAt         DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  month   String
+  dueDate DateTime
+
+  status String @default("PENDING")
+
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  societyId Int
+  society   Society @relation(fields: [societyId], references: [id])
 }
 
 model ParkingSlot {
@@ -283,4 +331,22 @@ model KYC {
   user User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+enum ExpenseCategory {
+  REPAIR
+  SALARY
+  UTILITY
+  MAINTENANCE
+  SECURITY
+  CLEANING
+  OTHER
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  ONLINE
+  OTHER
 }

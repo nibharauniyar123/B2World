@@ -7,7 +7,7 @@ function Invoices() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await axios.get("/payments");
+      const res = await axios.get("/api/payments");
       setPayments(res.data);
     } catch (error) {
       console.log(error);

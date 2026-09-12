@@ -11,6 +11,7 @@ export const register = async (req, res) => {
       name,
       email,
       password,
+      role
     } = req.body;
 
     console.log(req.body);
@@ -44,6 +45,7 @@ export const register = async (req, res) => {
 
           // IMPORTANT
           role: "RESIDENT",
+    
         },
       });
 
@@ -131,6 +133,62 @@ export const login = async (req, res) => {
 
     res.status(500).json({
       success: false,
+      error: error.message,
+    });
+  }
+};
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Check email
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate Reset Token
+    const resetToken = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    // Create Reset Link
+    const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    console.log("Reset Link:", resetLink);
+
+    // Send Email
+    await sendResetEmail(user.email, resetLink);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset link sent successfully.",
+    });
+
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send reset link.",
       error: error.message,
     });
   }

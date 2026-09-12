@@ -126,30 +126,58 @@ export const getComplaints = async (req, res) => {
 // ==============================
 
 
-export const updateComplaintStatus =
-  async (req, res) => {
-    try {
-      const { status } = req.body;
+// export const updateComplaintStatus =
+//   async (req, res) => {
+//     try {
+//       const { status } = req.body;
 
-      const complaint =
-        await prisma.complaint.update({
-          where: {
-            id: Number(req.params.id),
-          },
-          data: {
-            status,
-          },
-        });
+//       const complaint =
+//         await prisma.complaint.update({
+//           where: {
+//             id: Number(req.params.id),
+//           },
+//           data: {
+//             status,
+//           },
+//         });
 
-      res.json(complaint);
-    } catch (error) {
-      console.log(error);
+//       res.json(complaint);
+//     } catch (error) {
+//       console.log(error);
 
-      res.status(500).json({
-        error: error.message,
-      });
+//       res.status(500).json({
+//         error: error.message,
+//       });
+//     }
+//   };
+export const updateComplaintStatus = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { status } = req.body;
+
+    let resolutionTime = null;
+
+    if (status === "RESOLVED") {
+      resolutionTime = new Date();
     }
-  };
+
+    const complaint = await prisma.complaint.update({
+      where: { id },
+      data: {
+        status,
+        resolutionTime,
+      },
+    });
+
+    res.json(complaint);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 //Delete Complaint
 export const deleteComplaint =
@@ -380,4 +408,43 @@ export const assignVendor = async(req,res)=>{
    });
 
    res.json(complaint);
+};
+export const getMyComplaints = async (req, res) => {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
+    const complaints = await prisma.complaint.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        society: true,
+        vendor: true,
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    res.json(complaints);
+  } catch (error) {
+    console.error("MY COMPLAINTS ERROR:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch my complaints",
+    });
+  }
 };

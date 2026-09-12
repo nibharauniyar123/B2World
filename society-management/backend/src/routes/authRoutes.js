@@ -4,6 +4,7 @@ import express from "express";
 import {
   register,
   login,
+  forgotPassword,
 } from "../controllers/authController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -34,5 +35,10 @@ router.get(
     res.json(req.user);
   }
 );
+router.post("/forgot-password", (req, res) => {
+  res.json({
+    message: "Forgot Password API Working",
+  });
+});
 
 export default router;

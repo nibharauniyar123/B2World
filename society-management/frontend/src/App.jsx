@@ -34,7 +34,14 @@ import GuardDashboard from "./pages/GuardDashboard";
 import AccountantDashboard from "./pages/AccountantDashboard";
 import Parking from "./pages/Parking";
 import KYCUpload from "./pages/KYCUpload";
-
+import ResidentDashboard from "./pages/ResidentDashboard";
+import ApprovedVisitors from "./pages/ApprovedVisitors";
+import PendingVisitors from "./pages/PendingVisitors";
+import ForgotPassword from "./pages/ForgotPassword";
+import FlatDetails from "./pages/FlatDetails";
+import { ToastContainer } from "react-toastify";
+import AssignResident from "./pages/AssignResident";
+import MyComplaints from "./pages/MyComplaints";
 function App(){
 
  return(
@@ -63,6 +70,7 @@ function App(){
 </ProtectedRoute>
 } />
 
+
 <Route path="/accountant" element={
 <ProtectedRoute>
 <AccountantDashboard />
@@ -73,6 +81,14 @@ function App(){
     element={
      <ProtectedRoute>
       <Users/>
+     </ProtectedRoute>
+    }
+   />
+  <Route
+    path="/resident"
+    element={
+     <ProtectedRoute>
+      <ResidentDashboard/>
      </ProtectedRoute>
     }
    />
@@ -93,6 +109,10 @@ function App(){
  }
 />
 <Route
+  path="/assign-resident/:id"
+  element={<AssignResident />}
+/>
+<Route
  path="/settings"
  element={
   <ProtectedRoute>
@@ -108,11 +128,13 @@ function App(){
      </ProtectedRoute>
     }
    />
+  
    <Route path="/complaints" element={<Complaints />} />
    <Route path="/admin/complaints" element={<AdminComplaints />} />
    {/* <Route path="/my-complaints" element={<MyComplaints />} /> */}
    <Route path="/bookings" element={<Bookings />} />
    <Route path="/flats" element={<Flats />} />
+   <Route path="/flats/:id" element={<FlatDetails />} />
    <Route path="/notices" element={<Notices />} />
    <Route path="/visitors" element={<Visitors />} />
    <Route path="/maintenance" element={<Maintenance />} />
@@ -129,6 +151,20 @@ function App(){
     </ProtectedRoute>
   }
 />
+<Route
+   path="/approved-visitors"
+   element={<ApprovedVisitors />}
+/>
+<Route
+path="/pending-visitors"
+element={<PendingVisitors/>}
+/>
+<Route
+  path="/my-complaints"
+  element={<MyComplaints />}
+/>
+
+<Route path="/forgot-password" element={<ForgotPassword />} />  
 <Route path="/card" element={<Card title="Test Card" value="123" color="#4ade80" />} />  
 <Route path="/chart" element={<Chart />} />  
 <Route path="/notifications" element={<Notifications />} />
@@ -141,10 +177,12 @@ function App(){
 <Route path="/parking" element={<Parking />} /> 
 <Route path="/kyc-upload" element={<KYCUpload />} />
   </Routes>
+  
 
  )
 
 }
+ <ToastContainer />
 
 export default App
 

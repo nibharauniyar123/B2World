@@ -18,17 +18,31 @@ import {
 } from "recharts";
 import { jsPDF } from "jspdf";
 function Reports() {
-  const [report, setReport] = useState(null);
-
+const [report, setReport] = useState(null);
+const loadReports = async () => {
+   try {
+      const res = await axios.get("/api/reports");
+      console.log(res.data);
+      setReport(res.data);
+   } catch (err) {
+      console.log(err);
+   }
+};
 useEffect(() => {
   loadReports();
 }, []);
-
-const loadReports = async () => {
-  const res = await axios.get("/reports");
-
-  setReport(res.data);
-};
+if (!report) {
+   return (
+      <h2 style={{ padding: 30 }}>
+         Loading Reports...
+      </h2>
+   );
+}
+// const COLORS = [
+//  "#ef4444", // Open
+//  "#f59e0b", // In Progress
+//  "#22c55e", // Resolved
+// ];
 const openCount =
   report?.complaints?.filter(c => c.status === "OPEN").length || 0;
 
@@ -91,17 +105,14 @@ const inProgressCount =
   { month: "Apr", visitors: 90 },
 ];
 
-  const COLORS = [
-    "#2563eb",
-    "#16a34a",
-    "#dc2626",
-    "#f59e0b",
-  ];
+ const COLORS = [
+  "#ef4444", // Open (Red)
+  "#f59e0b", // In Progress (Orange)
+  "#22c55e", // Resolved (Green)
+];
 const avgResolutionHours =
-  report.avgResolutionTime
-    ? Math.round(
-        report.avgResolutionTime / 3600000
-      )
+  report?.avgResolutionTime
+    ? Math.round(report.avgResolutionTime / 3600000)
     : 0;
 const flats = report?.flats || [];
 
@@ -116,31 +127,6 @@ const tenantOccupied = flats.filter(
 const vacant = flats.filter(
   (f) => f.occupancyStatus === "VACANT"
 ).length;
-
-return (
-  <div className="stats-grid">
-
-  <div className="card">
-    <h3>Occupied Flats</h3>
-    <p>{occupied}</p>
-  </div>
-
-  <div className="card">
-    <h3>Vacant Flats</h3>
-    <p>{vacant}</p>
-  </div>
-
-  <div className="card">
-    <h3>Tenant Occupied</h3>
-    <p>{tenantOccupied}</p>
-  </div>
-  <div className="card">
-  <h3>Avg Resolution Time</h3>
-  <p>{avgResolutionHours} hrs</p>
-</div>
-
-</div>
-);
   const downloadReport = () => {
   const doc = new jsPDF();
 
@@ -217,20 +203,42 @@ return (
           <h3>Visitors</h3>
           <h2>{report?.visitors?.length || 0}</h2>
         </div>
+        <div style={styles.card}>
+  <h3>Occupied Flats</h3>
+  <h2>{occupied}</h2>
+</div>
+
+<div style={styles.card}>
+  <h3>Vacant Flats</h3>
+  <h2>{vacant}</h2>
+</div>
+
+<div style={styles.card}>
+  <h3>Tenant Occupied</h3>
+  <h2>{tenantOccupied}</h2>
+</div>
+
+<div style={styles.card}>
+  <h3>Avg Resolution Time</h3>
+  <h2>{avgResolutionHours} hrs</h2>
+</div>
       </div>
       <button
   onClick={downloadReport}
-  style={{
-    background: "#2563eb",
-    color: "#fff",
-    padding: "12px 20px",
-    border: "none",
+  style={styles.downloadBtn}
+>
+  Download Report
+</button>
+<div style={styles.chartBox}>
+  <h2>Monthly Revenue</h2>
+
+  {/* <ResponsiveContainer width="100%" height={300}> 
     borderRadius: "8px",
     marginBottom: "20px",
   }}
 >
   Download Report
-</button>
+</button> */}
 <div style={styles.chartBox}>
   <h2>Monthly Revenue</h2>
 
@@ -270,26 +278,22 @@ return (
   <h2>Complaint Status</h2>
 <ResponsiveContainer width="100%" height={350}>
   <PieChart>
-    <Pie
-      data={complaintData}
-      dataKey="value"
-      nameKey="name"
-      outerRadius={120}
-      label
-    >
-      <Pie
+   
+<Pie
   data={complaintData}
   dataKey="value"
   nameKey="name"
   outerRadius={120}
-  label={({name,value}) =>
-    `${name}: ${value}`
-  }
-/>
-      <Cell fill="#ff4d4f" />
-      <Cell fill="#faad14" />
-      <Cell fill="#52c41a" />
-    </Pie>
+  label={({ name, value }) => `${name}: ${value}`}
+>
+  {complaintData.map((entry, index) => (
+    <Cell
+      key={index}
+      fill={COLORS[index % COLORS.length]}
+    />
+  ))}
+</Pie>
+   
 
     <Tooltip />
     <Legend />
@@ -303,102 +307,22 @@ return (
     width="100%"
     height={300}
   >
-    <BarChart data={compareData}>
-      <XAxis dataKey="month" />
-      <YAxis />
-      <Tooltip />
-      <Bar
-        dataKey="revenue"
-        fill="#2563eb"
-      />
-     
-    </BarChart>
+  <BarChart data={visitorData}>
+  <XAxis dataKey="month" />
+  <YAxis />
+  <Tooltip />
+  <Bar
+    dataKey="visitors"
+    fill="#16a34a"
+  />
+</BarChart>
   </ResponsiveContainer>
 </div>    
-      <div style={styles.chartBox}>
-        <h2>Expense Distribution</h2>
-
-        <ResponsiveContainer
-          width="100%"
-          height={300}
-        >
-          <PieChart>
-            <Pie
-              data={expenseData}
-              dataKey="value"
-              outerRadius={120}
-              label
-            >
-              {expenseData.map(
-                (entry, index) => (
-                  <Cell
-                    key={index}
-                    fill={
-                      COLORS[
-                        index % COLORS.length
-                      ]
-                    }
-                  />
-                )
-              )}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-          
-{/* <PieChart width={400} height={300}>
-  <Pie
-    data={complaintData}
-    cx="50%"
-    cy="50%"
-    outerRadius={100}
-    dataKey="value"
-    label
-  >
-    <Cell fill="#ef4444" />
-    <Cell fill="#f59e0b" />
-    <Cell fill="#22c55e" />
-  </Pie>
-
-  <Tooltip />
-  <Legend />
-</PieChart> */}
-         </ResponsiveContainer> 
-      </div>
     </div>
   );
+  </div>
+  )
 }
 
-const styles = {
-  container: {
-    padding: "25px",
-    background: "#f1f5f9",
-    minHeight: "100vh",
-  },
-
-  cards: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit,minmax(220px,1fr))",
-    gap: "20px",
-    marginBottom: "30px",
-  },
-
-  card: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "12px",
-    boxShadow:
-      "0 4px 12px rgba(0,0,0,0.08)",
-  },
-
-  chartBox: {
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "12px",
-    marginBottom: "25px",
-    boxShadow:
-      "0 4px 12px rgba(0,0,0,0.08)",
-  },
-};
 
 export default Reports;

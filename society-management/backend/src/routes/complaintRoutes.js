@@ -9,6 +9,7 @@ import {
   resolveComplaint,
   addFeedback,
   assignVendor,
+  getMyComplaints,
 } from "../controllers/complaintController.js";
 
 import upload from "../middleware/uploadMiddleware.js";
@@ -69,6 +70,10 @@ router.put(
 router.put(
   "/:id/vendor",
   assignVendor
+);
+router.get(
+  "/my/:userId",
+  getMyComplaints
 );
 
 export default router;
