@@ -8,6 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { CSVLink } from "react-csv";
 
 import QRCode from "react-qr-code";
+import {
+  Html5Qrcode,
+  Html5QrcodeScanner,
+} from "html5-qrcode";
 import "./Visitors.css";
 
 
@@ -38,8 +42,19 @@ function Visitors() {
 
   const [showQR, setShowQR] =
     useState(null);
+  const [showScanner, handleOpenScanner] =
+  useState(false);
 
-
+const loggedInUser = JSON.parse(
+  localStorage.getItem("user")
+);
+const userRole = loggedInUser?.role;
+const isResident = userRole === "RESIDENT";
+const currentSociety = societies.find(
+  (society) =>
+    Number(society.id) ===
+    Number(loggedInUser?.societyId)
+);
   const perPage = 5;  
 
 
@@ -95,6 +110,9 @@ function Visitors() {
           "/api/visitors"
         );
 
+        console.log("VISITOR API RESPONSE:", response.data);
+console.log("VISITOR COUNT:", response.data?.length);
+
       setVisitors(
         response.data
       );
@@ -126,19 +144,35 @@ function Visitors() {
 
     try {
 
-      const response =
-        await axios.get(
-          "/api/users"
-        );
+      // const response =
+      //   await axios.get(
+      //     "/api/users"
+      //   );
 
 
-      const data =
-        response.data?.users ||
-        response.data ||
-        [];
+      // const data =
+      //   response.data?.users ||
+      //   response.data ||
+      //   [];
 
 
-      setUsers(data);
+      // setUsers(data);
+      const response = await axios.get("/api/users");
+
+console.log("ALL USERS FROM API:", response.data);
+
+const data =
+  response.data?.users ||
+  response.data ||
+  [];
+
+console.log("TOTAL USERS:", data.length);
+console.log(
+  "RESIDENT USERS:",
+  data.filter((user) => user.role === "RESIDENT")
+);
+
+setUsers(data);
 
     } catch (error) {
 
@@ -188,15 +222,32 @@ function Visitors() {
   // INITIAL LOAD
   // =====================================================
 
+  // useEffect(() => {
+
+  //   fetchVisitors();
+
+  //   fetchUsers();
+
+  //   fetchSocieties();
+
+  // }, []);
   useEffect(() => {
 
-    fetchVisitors();
+  fetchVisitors();
 
-    fetchUsers();
+  fetchUsers();
 
-    fetchSocieties();
+  fetchSocieties();
 
-  }, []);
+  if (loggedInUser?.societyId) {
+    setForm((prev) => ({
+      ...prev,
+      societyId:
+        loggedInUser.societyId,
+    }));
+  }
+
+}, []);
 
 
   // =====================================================
@@ -339,7 +390,172 @@ function Visitors() {
 
   };
 
+// =====================================================
+// QR SCAN
+// =====================================================
 
+// const handleQRScan = async (qrToken) => {
+//   try {
+
+//     const response = await axios.post(
+//       "/api/visitors/scan",
+//       {
+//         qrToken,
+//       }
+//     );
+
+//     toast.success(
+//       response.data.message ||
+//       "Visitor checked in successfully"
+//     );
+
+//     setShowScanner(false);
+
+//     await fetchVisitors();
+
+//   } catch (error) {
+
+//     console.error(
+//       "QR SCAN ERROR:",
+//       error.response?.data || error
+//     );
+
+//     toast.error(
+//       error.response?.data?.message ||
+//       "QR scan failed"
+//     );
+
+//   }
+// };
+const handleQRScan = async (qrToken) => {
+  try {
+    console.log(
+      "SCANNED QR VALUE:",
+      qrToken
+    );
+
+    const response =
+      await axios.post(
+        "/api/visitors/scan",
+        {
+          qrToken,
+        }
+      );
+
+    toast.success(
+      response.data.message ||
+      "Visitor checked in successfully"
+    );
+
+    setShowScanner(false);
+
+    await fetchVisitors();
+
+  } catch (error) {
+
+    console.error(
+      "QR SCAN ERROR:",
+      error.response?.data ||
+      error
+    );
+
+    toast.error(
+      error.response?.data?.message ||
+      "QR scan failed"
+    );
+  }
+};
+// =====================================================
+// HANDLE QR IMAGE UPLOAD
+// =====================================================
+
+const handleQRImageUpload = async (e) => {
+  const file = e.target.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  try {
+    const scanner = new Html5Qrcode(
+      "visitor-qr-file-reader"
+    );
+
+    const decodedText =
+      await scanner.scanFile(file, true);
+
+    console.log(
+      "QR IMAGE SCANNED:",
+      decodedText
+    );
+
+    await scanner.clear();
+
+    await handleQRScan(decodedText);
+
+  } catch (error) {
+
+    console.error(
+      "QR IMAGE SCAN ERROR:",
+      error
+    );
+
+    toast.error(
+      "QR code could not be detected from this image"
+    );
+
+  }
+};
+// =====================================================
+// QR SCANNER INITIALIZATION
+// =====================================================
+
+useEffect(() => {
+
+  if (!showScanner) {
+    return;
+  }
+
+  const scanner =
+    new Html5QrcodeScanner(
+      "visitor-qr-reader",
+      {
+        fps: 10,
+        qrbox: {
+          width: 250,
+          height: 250,
+        },
+      },
+      false
+    );
+
+  scanner.render(
+    (decodedText) => {
+
+      console.log(
+        "QR SCANNED:",
+        decodedText
+      );
+
+      scanner.clear();
+
+      handleQRScan(decodedText);
+    },
+
+    (errorMessage) => {
+      // QR not detected yet
+    }
+  );
+
+  return () => {
+
+    scanner
+      .clear()
+      .catch(() => {});
+
+  };
+
+}, [showScanner]);
   // =====================================================
   // CHECK IN
   // =====================================================
@@ -718,14 +934,32 @@ function Visitors() {
             Manage, approve and track
             society visitors
           </p>
+          </div>
+          {/* <button
+  onClick={() => setShowScanner(true)}
+  className="scan-qr-btn"
+>
+  📷 Scan Visitor QR
+</button> */}
+<button
+  className="scan-qr-main-btn"
+  onClick={handleOpenScanner}
+>
+  📷 Scan Visitor QR
+</button>
+
+
 
         </div>
 
-        <div className="admin-badge">
+        {/* <div className="admin-badge">
           ADMIN
-        </div>
+        </div> */}
+        <div className="admin-badge">
+  {userRole}
+</div>
 
-      </div>
+     
 
 
 
@@ -958,51 +1192,76 @@ function Visitors() {
 
           {/* RESIDENT */}
 
-          <div className="field">
+      
+              {!isResident && (
+  <div className="field">
+    <label>
+      Resident
+    </label>
 
-            <label>
-              Resident
-            </label>
+    <select
+      value={form.residentId}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          residentId: e.target.value,
+        })
+      }
+    >
+      <option value="">
+        Select Resident
+      </option>
 
-            <select
-              value={form.residentId}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  residentId:
-                    e.target.value,
-                })
-              }
-            >
+      {users
+        .filter(
+          (user) =>
+            user.role === "RESIDENT"
+        )
+        .map((user) => (
+          <option
+            key={user.id}
+            value={user.id}
+          >
+            {user.name} - {user.email}
+          </option>
+        ))}
+    </select>
+  </div>
+)}
 
-              <option value="">
+              {/* <option value="">
                 Select Resident
               </option>
 
+{users
+  .filter(
+    (user) =>
+      Number(user.societyId) ===
+      Number(loggedInUser?.societyId)
+  )
+  .map((user) => (
 
-              {users.map((user) => (
+    <option
+      key={user.id}
+      value={user.id}
+    >
 
-                <option
-                  key={user.id}
-                  value={user.id}
-                >
+      {user.name}
+      {" - "}
+      {user.email}
 
-                  {user.name}
-                  {" - "}
-                  {user.email}
+    </option>
 
-                </option>
-
-              ))}
+  ))}
 
             </select>
 
-          </div>
+          </div> */}
 
 
           {/* SOCIETY */}
 
-          <div className="field">
+          {/* <div className="field">
 
             <label>
               Society
@@ -1041,7 +1300,26 @@ function Visitors() {
 
             </select>
 
-          </div>
+          </div> */}
+
+          {/* SOCIETY */}
+
+<div className="field">
+
+  <label>
+    Society
+  </label>
+
+  <input
+    type="text"
+    value={
+      currentSociety?.name ||
+      "Loading society..."
+    }
+    readOnly
+  />
+
+</div>
 
 
           {/* VISIT DATE */}
@@ -1784,7 +2062,99 @@ function Visitors() {
 
       </div>
 
+{/* =================================================
+    QR SCANNER MODAL
+================================================= */}
 
+{showScanner && (
+
+  <div
+    className="modal-overlay"
+    onClick={() =>
+      handleOpenScanner(false)
+    }
+  >
+
+    <div
+      className="qr-modal"
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+    >
+
+      <button
+        className="close-btn"
+        onClick={() =>
+          handleOpenScanner(false)
+        }
+      >
+        ×
+      </button>
+
+      <h2>
+        Scan Visitor QR
+      </h2>
+
+      <p>
+        Place the visitor QR code inside
+        the scanner.
+      </p>
+
+      <div
+        id="visitor-qr-reader"
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          margin: "20px auto",
+        }}
+      />
+
+      <div
+  id="visitor-qr-file-reader"
+  style={{
+    display: "none",
+  }}
+/>
+
+<div
+  style={{
+    marginTop: "20px",
+    textAlign: "center",
+  }}
+>
+  <p>
+    Or upload a QR screenshot
+  </p>
+
+  <label
+    className="upload-qr-btn"
+    style={{
+      display: "inline-block",
+      padding: "10px 18px",
+      borderRadius: "8px",
+      cursor: "pointer",
+      background: "#2563eb",
+      color: "#fff",
+    }}
+  >
+    🖼️ Upload QR Image
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleQRImageUpload}
+      style={{
+        display: "none",
+      }}
+    />
+  </label>
+</div>
+
+    </div>
+
+  </div>
+
+)}
 
       {/* =================================================
           QR MODAL

@@ -203,9 +203,15 @@ const formatMoney = (amount) => {
               <p>Overview of registered societies</p>
             </div>
 
-            <a href="/societies" className="view-link">
+            {/* <a href="/societies" className="view-link">
               Manage →
-            </a>
+            </a> */}
+            <a
+  href="/super-admin/societies"
+  className="view-link"
+>
+  Manage →
+</a>
           </div>
 
           {data.societies.length === 0 ? (
@@ -297,12 +303,18 @@ const formatMoney = (amount) => {
               <p>Plan distribution</p>
             </div>
 
-            <a
+            {/* <a
               href="/subscriptions"
               className="view-link"
             >
               Manage →
-            </a>
+            </a> */}
+            <a
+  href="/super-admin/subscriptions"
+  className="view-link"
+>
+  Manage →
+</a>
           </div>
 
           <div className="chart">
@@ -363,12 +375,18 @@ const formatMoney = (amount) => {
             <p>Latest system activities</p>
           </div>
 
-          <a
+          {/* <a
             href="/activity-logs"
             className="view-link"
           >
             View All →
-          </a>
+          </a> */}
+          <a
+  href="/super-admin/activity-logs"
+  className="view-link"
+>
+  View All →
+</a>
 
         </div>
 

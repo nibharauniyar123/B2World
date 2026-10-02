@@ -11,11 +11,40 @@ const prisma = new PrismaClient();
 export const getVisitors = async (req, res) => {
   try {
 
+    // const visitors = await prisma.visitor.findMany({
+    //     where: {
+    //     societyId: req.user.societyId,
+    //   },
     const visitors = await prisma.visitor.findMany({
+  where: {
+    societyId: req.user.societyId,
+
+    ...(req.user.role === "RESIDENT"
+      ? {
+          residentId: req.user.id,
+        }
+      : {}),
+  },
       orderBy: {
         createdAt: "desc",
       },
     });
+
+    console.log(
+      "ADMIN SOCIETY ID:",
+      req.user.societyId
+    );
+  console.log(
+  "TOTAL VISITORS FROM DATABASE:",
+  visitors.length
+);
+
+console.log(
+  "VISITORS DATA:",
+  visitors
+);
+   
+   
 
     res.json(visitors);
 
@@ -46,7 +75,7 @@ export const createVisitor = async (req, res) => {
       phone,
       purpose,
       residentId,
-      societyId,
+      // societyId,
       visitorType,
       visitDate,
       expectedTime,
@@ -67,6 +96,47 @@ export const createVisitor = async (req, res) => {
       });
     }
 
+    // ==========================================
+// VERIFY RESIDENT SOCIETY
+// ==========================================
+
+if (residentId) {
+
+  const resident = await prisma.user.findUnique({
+    where: {
+      id: Number(residentId),
+    },
+    select: {
+      id: true,
+      name: true,
+      role: true,
+      societyId: true,
+    },
+  });
+
+  if (!resident) {
+    return res.status(404).json({
+      message: "Resident not found",
+    });
+  }
+
+  if (resident.role !== "RESIDENT") {
+    return res.status(400).json({
+      message: "Selected user is not a resident",
+    });
+  }
+
+  if (
+    Number(resident.societyId) !==
+    Number(req.user.societyId)
+  ) {
+    return res.status(403).json({
+      message:
+        "Resident does not belong to your society",
+    });
+  }
+}
+
 
     // -----------------------------
     // QR GENERATION
@@ -85,24 +155,40 @@ export const createVisitor = async (req, res) => {
     // -----------------------------
 
     const visitor = await prisma.visitor.create({
+      // data: {
+
+      //   name: name.trim(),
+
+      //   phone: phone.trim(),
+
+      //   purpose:
+      //     purpose?.trim() || null,
+
+      //   residentId:
+      //     residentId
+      //       ? Number(residentId)
+      //       : null,
+
+      //   // societyId:
+      //   //   societyId
+      //   //     ? Number(societyId)
+      //   //     : null,
+      //   societyId: req.user.societyId,
       data: {
+  name: name.trim(),
+  phone: phone.trim(),
+  purpose: purpose?.trim() || null,
 
-        name: name.trim(),
+  // Resident cannot choose another resident
+  residentId:
+    req.user.role === "RESIDENT"
+      ? req.user.id
+      : residentId
+        ? Number(residentId)
+        : null,
 
-        phone: phone.trim(),
-
-        purpose:
-          purpose?.trim() || null,
-
-        residentId:
-          residentId
-            ? Number(residentId)
-            : null,
-
-        societyId:
-          societyId
-            ? Number(societyId)
-            : null,
+  // Society always comes from logged-in user
+  societyId: req.user.societyId,
 
         visitorType:
           visitorType || null,
@@ -131,7 +217,16 @@ export const createVisitor = async (req, res) => {
 
         qrToken,
 
-        status: "PENDING",
+        // status: "PENDING",
+        status:
+  req.user.role === "RESIDENT"
+    ? "APPROVED"
+    : "PENDING",
+
+    approvedAt:
+  req.user.role === "RESIDENT"
+    ? new Date()
+    : null,
       },
     });
 
@@ -258,7 +353,82 @@ export const updateVisitorStatus = async (req, res) => {
   }
 };
 
+// =====================================================
+// SCAN QR AND CHECK IN VISITOR
+// =====================================================
 
+export const scanVisitorQR = async (req, res) => {
+
+  try {
+
+    const { qrToken } = req.body;
+
+    if (!qrToken) {
+      return res.status(400).json({
+        message: "QR token is required",
+      });
+    }
+
+    // Find visitor using QR token
+    const visitor =
+      await prisma.visitor.findFirst({
+        where: {
+          qrToken: qrToken,
+          societyId: req.user.societyId,
+        },
+      });
+
+    if (!visitor) {
+      return res.status(404).json({
+        message:
+          "Visitor not found or visitor belongs to another society",
+      });
+    }
+
+    // Visitor must be approved
+    if (visitor.status !== "APPROVED") {
+
+      return res.status(400).json({
+        message:
+          `Visitor cannot check in. Current status: ${visitor.status}`,
+      });
+
+    }
+
+    // Check in visitor
+    const updatedVisitor =
+      await prisma.visitor.update({
+        where: {
+          id: visitor.id,
+        },
+
+        data: {
+          status: "CHECKED_IN",
+          checkIn: new Date(),
+        },
+      });
+
+    return res.json({
+      message:
+        "Visitor checked in successfully",
+      visitor: updatedVisitor,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "SCAN VISITOR QR ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        "QR scan check-in failed",
+      error: error.message,
+    });
+
+  }
+};
 // =====================================================
 // CHECK IN
 // =====================================================

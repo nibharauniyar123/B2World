@@ -612,7 +612,7 @@ const downloadInvoice = (payment) => {
 
           <input
             style={styles.input}
-            placeholder="Maintenance"
+            placeholder="AMOUNT"
             value={form.amount}
             onChange={(e) =>
               setForm({
@@ -767,7 +767,7 @@ setForm({...form,societyId:e.target.value})
 
         <th>User</th>
 
-        <th>Maintenance</th>
+        <th>Total Amount</th>
 
         <th>Water</th>
 

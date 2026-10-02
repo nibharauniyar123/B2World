@@ -42,6 +42,13 @@ import FlatDetails from "./pages/FlatDetails";
 import { ToastContainer } from "react-toastify";
 import AssignResident from "./pages/AssignResident";
 import MyComplaints from "./pages/MyComplaints";
+import SuperAdminSocieties from "./pages/SuperAdminSocieties";
+import SuperAdminSubscriptions
+from "./pages/SuperAdminSubscriptions";
+import SuperAdminActivityLogs
+from "./pages/SuperAdminActivityLogs";
+
+
 function App(){
 
  return(
@@ -58,11 +65,19 @@ function App(){
   </ProtectedRoute>
     }
    />
-<Route path="/super-admin" element={
+{/* <Route path="/super-admin" element={
 <ProtectedRoute>
 <SuperAdminDashboard />
 </ProtectedRoute>
-} />
+} /> */}
+<Route
+  path="/super-admin/dashboard"
+  element={
+    <ProtectedRoute>
+      <SuperAdminDashboard />
+    </ProtectedRoute>
+  }
+/>
 
 <Route path="/guard" element={
 <ProtectedRoute>
@@ -107,6 +122,18 @@ function App(){
    <Profile />
   </ProtectedRoute>
  }
+/>
+<Route
+  path="/super-admin/societies"
+  element={<SuperAdminSocieties />}
+/>
+<Route
+  path="/super-admin/subscriptions"
+  element={<SuperAdminSubscriptions />}
+/>
+<Route
+  path="/super-admin/activity-logs"
+  element={<SuperAdminActivityLogs />}
 />
 <Route
   path="/assign-resident/:id"
