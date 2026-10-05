@@ -1,14 +1,72 @@
+// import express from "express";
+
+// import {
+//   getParkingSlots,
+//   createParkingSlot
+// } from "../controllers/parkingController.js";
+
+// const router = express.Router();
+
+// router.get("/",getParkingSlots);
+
+// router.post("/",createParkingSlot);
+
+// export default router;
 import express from "express";
 
 import {
-  getParkingSlots,
-  createParkingSlot
-} from "../controllers/parkingController.js";
+  getNotifications,
+  getUnreadCount,
+  createNotification,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+} from "../controllers/notificationController.js";
+
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/",getParkingSlots);
+// Get logged-in user's notifications
+router.get(
+  "/",
+  protect,
+  getNotifications
+);
 
-router.post("/",createParkingSlot);
+// Get unread notification count
+router.get(
+  "/unread-count",
+  protect,
+  getUnreadCount
+);
+
+// Create notification
+router.post(
+  "/",
+  protect,
+  createNotification
+);
+
+// Mark all notifications as read
+router.put(
+  "/read-all",
+  protect,
+  markAllAsRead
+);
+
+// Mark one notification as read
+router.put(
+  "/:id/read",
+  protect,
+  markAsRead
+);
+
+// Delete notification
+router.delete(
+  "/:id",
+  protect,
+  deleteNotification
+);
 
 export default router;

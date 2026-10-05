@@ -50,11 +50,11 @@ const adminMenu = [
   { name: "My Complaints", icon: <FaExclamationCircle />, path: "/complaints" },
   { name: "My Bookings", icon: <FaCalendarCheck />, path: "/bookings" },
   { name: "Notices", icon: <FaBuilding />, path: "/notices" },
-  {
-  name: "My Complaints",
-  path: "/my-complaints",
-  icon: <FaExclamationCircle />,
-},
+//   {
+//   name: "My Complaints",
+//   path: "/my-complaints",
+//   icon: <FaExclamationCircle />,
+// },
 ];
 
   // ================= SECURITY =================

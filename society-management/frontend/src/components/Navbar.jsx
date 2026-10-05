@@ -1,4 +1,5 @@
-import { FaUserCircle } from "react-icons/fa";
+// import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaBell } from "react-icons/fa";
 
 function Navbar({ user, onLogout }) {
   return (
@@ -7,6 +8,7 @@ function Navbar({ user, onLogout }) {
 
       <div className="nav-right">
         <FaUserCircle size={20} />
+        <FaBell size={20} />
         <span>{user?.name} ({user?.role})</span>
         <button onClick={onLogout}>Logout</button>
       </div>

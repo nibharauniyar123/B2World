@@ -34,6 +34,7 @@ model User {
   payments   Payment[]
   kyc        KYC?
   ownedFlats Flat[]
+  notifications Notification[]
 }
 
 model Society {
@@ -278,6 +279,22 @@ model Notice {
   societyId Int
 
   society Society @relation(fields: [societyId], references: [id])
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  title   String
+  message String
+
+  type String @default("GENERAL")
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }
 
 model Payment {

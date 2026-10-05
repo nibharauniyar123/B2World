@@ -230,7 +230,30 @@ if (residentId) {
       },
     });
 
+// Create notification for resident
+// if (visitor.residentId) {
+//   await prisma.notification.create({
+//     data: {
+//       title: "New Visitor",
+//       message: `${visitor.name} is waiting for your approval.`,
+//       type: "VISITOR",
+//       userId: visitor.residentId,
+//     },
+//   });
+// }
 
+if (visitor.residentId) {
+  const notification = await prisma.notification.create({
+    data: {
+      title: "New Visitor",
+      message: `${visitor.name} is waiting for your approval.`,
+      type: "VISITOR",
+      userId: visitor.residentId,
+    },
+  });
+
+  console.log("🔔 NOTIFICATION CREATED:", notification);
+}
     console.log("VISITOR CREATED:", visitor);
 
     res.status(201).json({

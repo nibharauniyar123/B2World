@@ -210,6 +210,7 @@ const handleCreate = async () => {
                 textAlign: "left",
               }}
             >
+              <th style={thStyle}>ID</th>
               <th style={thStyle}>Name</th>
               <th style={thStyle}>Email</th>
               <th style={thStyle}>Role</th>
@@ -228,6 +229,7 @@ const handleCreate = async () => {
                       index % 2 === 0 ? "#ffffff" : "#f8fafc",
                   }}
                 >
+                  <td style={tdStyle}>{user.id}</td>
                   <td style={tdStyle}>{user.name}</td>
 
                   <td style={tdStyle}>{user.email}</td>
@@ -274,7 +276,7 @@ const handleCreate = async () => {
             ) : (
               <tr>
                 <td
-                  colSpan="4"
+                  colSpan="5"
                   style={{
                     padding: "25px",
                     textAlign: "center",
